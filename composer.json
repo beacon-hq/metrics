@@ -1,0 +1,64 @@
+{
+    "name": "beacon-hq/metrics",
+    "description": "Simple metrics and trends data for Laravel",
+    "type": "library",
+    "keywords": [
+        "laravel-package",
+        "charts",
+        "metrics",
+        "trends",
+        "laravel",
+        "dashboard"
+    ],
+    "homepage": "https://github.com/beacon-hq/metrics",
+    "license": "MIT",
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^8.2",
+        "illuminate/database": "^11.4 || ^12",
+        "illuminate/support": "^11.4 || ^12",
+        "nesbot/carbon": "^3.8",
+        "ramsey/conventional-commits": "^1.5.1",
+        "staudenmeir/laravel-cte": "^1.0"
+    },
+    "require-dev": {
+        "captainhook/captainhook-phar": "^5.23",
+        "captainhook/hook-installer": "^1.0",
+        "driftingly/rector-laravel": "^2.0",
+        "larastan/larastan": "^3.0",
+        "laravel/pint": "^1.15",
+        "orchestra/pest-plugin-testbench": "^2.0|^3.0",
+        "pestphp/pest": "^2.0|^3.0",
+        "pestphp/pest-plugin-faker": "^2.0|^3.0",
+        "pestphp/pest-plugin-type-coverage": "^3.5",
+        "rector/rector": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Beacon\\Metrics\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "pest",
+        "style": "pint"
+    },
+    "authors": [
+        {
+            "name": "Davey Shafik",
+            "email": "davey@php.net"
+        }
+    ],
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "captainhook/captainhook-phar": true,
+            "captainhook/hook-installer": true,
+            "pestphp/pest-plugin": true
+        }
+    }
+}
