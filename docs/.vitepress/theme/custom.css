@@ -1,0 +1,59 @@
+:root {
+    --vp-font-family-base: "Source Sans 3", sans-serif;
+    --vp-font-family-mono: "Source Code Pro", monospace;
+    --vp-nav-logo-height: 64px;
+    --vp-code-line-highlight-color: var(--vp-badge-tip-bg);
+    --vp-c-brand-1: #05a3fd;
+    --vp-home-hero-name-color: #01e69d;
+    --vp-button-brand-bg: #01e69d;
+    --vp-button-brand-hover-bg: #05a3fd;
+}
+
+header .title span {
+    font-size: 22px;
+    font-family: var(--vp-font-family-base);
+}
+
+.heading .text {
+    font-size: 3rem;
+    font-weight: 400;
+}
+
+header .title img {
+    padding: 8px;
+}
+
+code {
+    white-space: pre;
+}
+
+.mermaid rect, .mermaid polygon {
+    fill: var(--vp-c-default-soft) !important;
+    stroke: var(--vp-c-default-1) !important;
+}
+
+.mermaid-start > rect {
+    fill: var(--vp-c-indigo-soft) !important;
+    stroke: var(--vp-c-indigo-1) !important;
+}
+
+.mermaid-decision > polygon {
+    fill: var(--vp-c-yellow-soft) !important;
+    stroke: var(--vp-c-yellow-1) !important;
+}
+
+.mermaid-conditional > rect {
+    fill: var(--vp-c-purple-soft) !important;
+    stroke: var(--vp-c-purple-1) !important;
+}
+
+.mermaid-error > rect {
+    fill: var(--vp-c-danger-soft) !important;
+    stroke: var(--vp-c-danger-1) !important;
+
+}
+
+.mermaid-end > rect {
+    fill: var(--vp-c-success-soft) !important;
+    stroke: var(--vp-c-success-1) !important;
+}
