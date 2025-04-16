@@ -1,2 +1,5 @@
 /vendor
+/node_modules
 /tests/output
+/docs/.vitepress/dist/
+/docs/.vitepress/cache/
