@@ -30,14 +30,7 @@ trait WithDates
         return $this;
     }
 
-    public function forDate(CarbonInterface $date): self
-    {
-        $this->between(CarbonImmutable::create($date)->startOfDay(), CarbonImmutable::create($date)->endOfDay());
-
-        return $this;
-    }
-
-    public function forPeriod(Period|DatePeriod $period): self
+    public function period(Period|DatePeriod $period): self
     {
         $now = CarbonImmutable::now();
 
@@ -78,58 +71,6 @@ trait WithDates
             Period::YEAR_TO_DATE => $this->between($now->startOfYear(), $now->endOfDay()),
             Period::YESTERDAY => $this->between($now->subDay()->startOfDay(), $now->subDay()->endOfDay()),
         };
-
-        return $this;
-    }
-
-    public function forMinute(int $minute): self
-    {
-        $minute = CarbonImmutable::now()->minute($minute);
-        $this->between($minute->startOfMinute(), $minute->endOfMinute());
-
-        return $this;
-    }
-
-    public function forHour(int $hour): self
-    {
-        $hour = CarbonImmutable::now()->hour($hour);
-        $this->between($hour->startOfHour(), $hour->endOfHour());
-
-        return $this;
-    }
-
-    public function forDay(int $day): self
-    {
-        $day = CarbonImmutable::now()->day($day);
-        $this->between($day->startOfDay(), $day->endOfDay());
-
-        return $this;
-    }
-
-    public function forWeek(int $week): self
-    {
-        $week = match ($this->driver) {
-            'sqlite' => CarbonImmutable::now()->week($week),
-            default => CarbonImmutable::now()->isoWeek($week),
-        };
-
-        $this->between($week->startOfWeek(), $week->endOfWeek());
-
-        return $this;
-    }
-
-    public function forMonth(int $month): self
-    {
-        $month = CarbonImmutable::now()->month($month);
-        $this->between($month->startOfMonth(), $month->endOfMonth());
-
-        return $this;
-    }
-
-    public function forYear(int $year): self
-    {
-        $year = CarbonImmutable::now()->year($year);
-        $this->between($year->startOfYear(), $year->endOfYear());
 
         return $this;
     }
@@ -224,8 +165,8 @@ trait WithDates
         return $query->whereBetween(
             DB::raw($this->table.'.'.$this->dateColumn),
             [
-                $this->formatDatetimeFloor($this->between['from'], $cast),
-                $this->formatDatetimeCeil($this->between['to']),
+                DB::raw($this->formatDatetimeFloor($this->between['from'], $cast)),
+                DB::raw($this->formatDatetimeCeil($this->between['to'])),
             ]
         );
     }

@@ -6,13 +6,13 @@ namespace Beacon\Metrics\Concerns;
 
 trait WithValue
 {
-    protected function formatNumber(null|int|float $number, int $decimalPlaces = -1): int|float
+    protected function formatNumber(null|int|float|string $number, int $decimalPlaces = -1): int|float
     {
         if ($number === null) {
             return $this->missingDataValue;
         }
 
-        if (fmod($number, 1.00) === 0.0) {
+        if (fmod((float) $number, 1.00) === 0.0) {
             return (int) $number;
         }
 

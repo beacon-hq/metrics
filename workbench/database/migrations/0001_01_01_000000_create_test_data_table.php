@@ -31,6 +31,10 @@ return new class extends Migration
             $table->integer('value');
             $table->string('category');
             $table->timestamps();
+
+            $table->index(['category', 'value']);
+            $table->index(['category', 'created_at']);
+            $table->index('created_at');
         });
 
         /** @var Carbon $dates */
@@ -84,6 +88,8 @@ return new class extends Migration
         foreach ($dates as $index => $date) {
             $category = $categories[$index % count($categories)];
             $value = ($index + 1) * 10;
+
+            // $date = $date->subHour();
 
             DB::table('test_data')->insert([
                 'name' => "Item $index",
