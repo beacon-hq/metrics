@@ -12,38 +12,21 @@ trait WithValueMetric
 {
     public string $query;
 
-    public function valueWithPrevious(): Collection
+    protected bool $withPrevious = false;
+
+    public function withPrevious($enabled = true): self
     {
-        $interval = $this->between['from']->diff($this->between['to']);
-        $previous = (clone $this)->between($this->between['from']->sub($interval), $this->between['to']->sub((clone $interval)->addSeconds(1)))->value();
+        $this->withPrevious = $enabled;
 
-        $result['value'] = $this->value();
-        $result['previous'] = [
-            'value' => $previous,
-        ];
-
-        $difference = $result['value'] - $previous;
-        if ($difference > 0) {
-            $result['previous'] = [
-                'type' => 'increase',
-                'value' => $previous,
-                'difference' => $difference,
-                'percentage' => $this->calculatePercentage($previous, $result['value']),
-            ];
-        } elseif ($difference < 0) {
-            $result['previous'] = [
-                'type' => 'decrease',
-                'value' => $previous,
-                'difference' => abs($difference),
-                'percentage' => $this->calculatePercentage($result['value'], $previous),
-            ];
-        }
-
-        return collect($result);
+        return $this;
     }
 
     public function value(): int|float|Collection
     {
+        if ($this->withPrevious) {
+            return $this->valueWithPrevious();
+        }
+
         $query = $this->applyBetween((clone $this->builder), false);
 
         $columns = [$this->selectData()];
@@ -68,6 +51,36 @@ trait WithValueMetric
         }
 
         return $this->formatNumber($query->first('metric')->metric);
+    }
+
+    protected function valueWithPrevious(): Collection
+    {
+        $interval = $this->between['from']->diff($this->between['to']);
+        $previous = (clone $this)->withPrevious(false)->between($this->between['from']->sub($interval), $this->between['to']->sub((clone $interval)->addSeconds(1)))->value();
+
+        $result['value'] = $this->withPrevious(false)->value();
+        $result['previous'] = [
+            'value' => $previous,
+        ];
+
+        $difference = $result['value'] - $previous;
+        if ($difference > 0) {
+            $result['previous'] = [
+                'type' => 'increase',
+                'value' => $previous,
+                'difference' => $difference,
+                'percentage' => $this->calculatePercentage($previous, $result['value']),
+            ];
+        } elseif ($difference < 0) {
+            $result['previous'] = [
+                'type' => 'decrease',
+                'value' => $previous,
+                'difference' => abs($difference),
+                'percentage' => $this->calculatePercentage($result['value'], $previous),
+            ];
+        }
+
+        return collect($result);
     }
 
     protected function calculatePercentage(float|int $current, float|int $previous): int|float

@@ -16,19 +16,27 @@ trait WithTrendMetric
 {
     public function trends(bool $inPercent = false): Collection
     {
-        $baseQuery = DB::query()->select(DB::raw($this->formatDatetimeFloor($this->between['from']) . ' AS dt'));
+        $baseQuery = DB::query()
+            ->select(DB::raw($this->formatDatetimeFloor($this->between['from']).' AS dt'));
 
         $recursiveQuery = (clone $this->builder)->newQuery()->select(DB::raw($this->getIntervalSequence('date_series.dt').' AS dt'))
             ->where(
                 DB::raw($this->getIntervalSequence('date_series.dt')),
                 '<=',
-                $this->formatDatetimeCeil($this->between['to'])
+                $this->driver !== 'sqlite'
+                    ? DB::raw($this->formatDatetimeCeil($this->between['to']))
+                    : $this->applyBetween(
+                        (clone $this->builder)
+                            ->select(DB::raw($this->formatDatetimeCeil($this->between['to'])))
+                            ->from($this->table)
+                    )
             )
             ->from('date_series');
 
-        $builder = $baseQuery->unionAll($recursiveQuery);
+        $builder = $baseQuery->union($recursiveQuery, $this->driver === 'sqlite');
 
         /** @var \Staudenmeir\LaravelCte\Query\Builder $query */
+        // @phpstan-ignore method.notFound
         $query = (clone $this->builder)
             ->withRecursiveExpression('date_series', $builder, ['dt']);
 
@@ -60,7 +68,8 @@ trait WithTrendMetric
 
         $this->query = $query->toRawSql();
 
-        $trendsData = $query->get()->map(fn (object $datum) => (array) $datum);
+        $results = $query->get();
+        $trendsData = $results->map(fn (object $datum) => (array) $datum);
 
         return $this->getFormattedTrendsData($trendsData, $inPercent);
     }

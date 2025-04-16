@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Beacon\Metrics\Concerns;
 
-use Carbon\CarbonInterface;
 use Beacon\Metrics\Enums\Aggregate;
 use Beacon\Metrics\Enums\Interval;
+use Carbon\CarbonInterface;
 
 trait WithMin
 {

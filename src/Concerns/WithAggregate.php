@@ -41,7 +41,7 @@ trait WithAggregate
     {
         $aggregateExpression = "{$this->aggregate->value}(".($column ?? $this->column).')';
         if ($this->fillMissing) {
-            return DB::raw("COALESCE(NULLIF($aggregateExpression, 0), {$this->missingDataValue}) as metric");
+            return DB::raw(sprintf('COALESCE(NULLIF(%s, 0), %s) as metric', $aggregateExpression, $this->missingDataValue ?? 'NULL'));
         } else {
             return DB::raw("$aggregateExpression as metric");
         }

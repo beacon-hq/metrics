@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Carbon\CarbonImmutable;
 use Beacon\Metrics\Concerns\WithTrendMetric;
 use Beacon\Metrics\Metrics;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 
 covers(
