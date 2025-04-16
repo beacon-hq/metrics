@@ -15,11 +15,11 @@
     "minimum-stability": "stable",
     "require": {
         "php": "^8.2",
-        "illuminate/database": "^11.4 || ^12",
-        "illuminate/support": "^11.4 || ^12",
+        "illuminate/database": "^10|^11|^12",
+        "illuminate/support": "^10|^11|^12",
         "nesbot/carbon": "^3.8",
         "ramsey/conventional-commits": "^1.5.1",
-        "staudenmeir/laravel-cte": "^1.0"
+        "staudenmeir/laravel-cte": "^1.9"
     },
     "require-dev": {
         "captainhook/captainhook-phar": "^5.23",
