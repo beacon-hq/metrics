@@ -11,7 +11,6 @@ on:
 jobs:
   tests:
     name: Tests
-
     runs-on: 'ubuntu-latest'
     strategy:
       matrix:
@@ -28,6 +27,27 @@ jobs:
           - php-versions: '8.4'
             laravel-versions: '^10'
       fail-fast: false
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: metrics
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
       - name: Checkout
@@ -49,7 +69,18 @@ jobs:
         run: composer install --no-ansi --no-interaction --no-progress ${{ matrix.ignore-platform-reqs }} && composer require barryvdh/laravel-debugbar spatie/laravel-typescript-transformer --dev
 
       - name: Run tests with pest
-        run: vendor/bin/pest --parallel --coverage --min=80
+        run: vendor/bin/pest --coverage --min=80
+        env:
+          POSTGRES_HOST: 127.0.0.1
+          POSTGRES_PORT: 5432
+          POSTGRES_DB: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          MYSQL_HOST: 127.0.0.1
+          MYSQL_PORT: 3306
+          MYSQL_DATABASE: metrics
+          MYSQL_USER: root
+          MYSQL_PASSWORD: ''
   doc-build:
     runs-on: ubuntu-latest
     steps:

@@ -8,7 +8,9 @@ use Illuminate\Support\Carbon;
 
 covers(WithMax::class);
 
-it('maxs between', function () {
+it('maxs between', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -19,9 +21,11 @@ it('maxs between', function () {
         ->toBe('2025-04-06')
         ->and($trends['labels'][4])
         ->toBe('2025-04-10');
-});
+})->with('databases');
 
-it('maxs from', function () {
+it('maxs from', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -32,9 +36,11 @@ it('maxs from', function () {
         ->toBe('2025-04-06')
         ->and($trends['labels'][4])
         ->toBe('2025-04-10');
-});
+})->with('databases');
 
-it('maxs by second', function () {
+it('maxs by second', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -116,9 +122,11 @@ it('maxs by second', function () {
         ],
         'total' => 340,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('maxs by minute', function () {
+it('maxs by minute', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -196,9 +204,11 @@ it('maxs by minute', function () {
         ],
         'total' => 340,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('maxs by hour', function () {
+it('maxs by hour', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -278,9 +288,11 @@ it('maxs by hour', function () {
         ],
         'total' => 340,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('maxs by day', function () {
+it('maxs by day', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -360,9 +372,11 @@ it('maxs by day', function () {
         ],
         'total' => 340,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('maxs by day of the week', function () {
+it('maxs by day of the week', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -404,9 +418,11 @@ it('maxs by day of the week', function () {
         ],
         'total' => 340,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('maxs by week', function () {
+it('maxs by week', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -429,7 +445,6 @@ it('maxs by week', function () {
 
     expect($value->toArray())->toBe([
         'labels' => [
-            '2024-W01',
             '2024-W33',
             '2024-W35',
             '2024-W36',
@@ -443,6 +458,7 @@ it('maxs by week', function () {
             '2024-W48',
             '2024-W50',
             '2024-W51',
+            '2025-W01',
             '2025-W02',
             '2025-W04',
             '2025-W05',
@@ -456,7 +472,6 @@ it('maxs by week', function () {
             '2025-W15',
         ],
         'data' => [
-            140,
             340,
             320,
             310,
@@ -470,6 +485,7 @@ it('maxs by week', function () {
             190,
             170,
             160,
+            140,
             130,
             110,
             100,
@@ -484,9 +500,11 @@ it('maxs by week', function () {
         ],
         'total' => 340,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('maxs by month', function () {
+it('maxs by month', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -566,9 +584,11 @@ it('maxs by month', function () {
         ],
         'total' => 340,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('maxs by year', function () {
+it('maxs by year', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -644,4 +664,4 @@ it('maxs by year', function () {
         ],
         'total' => 340,
     ], $metrics->query);
-});
+})->with('databases');

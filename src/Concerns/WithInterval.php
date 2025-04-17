@@ -95,7 +95,16 @@ trait WithInterval
 
     protected function getIntervalLabel(Interval $interval, string $column): Expression
     {
+        if ($interval === Interval::WEEK) {
+            $interval = Interval::DAY;
+        }
+
         return DB::raw($this->parseDate($interval, $column).' AS label');
+    }
+
+    protected function getIntervalGroup(Interval $interval, string $column): Expression
+    {
+        return DB::raw($this->parseDate($interval, $column).' AS grp_label');
     }
 
     protected function parseDate(Interval $interval, ?string $column = null): string

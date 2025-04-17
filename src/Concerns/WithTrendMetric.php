@@ -10,7 +10,6 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 trait WithTrendMetric
 {
@@ -43,6 +42,7 @@ trait WithTrendMetric
         $columns = [
             $this->selectData(),
             $this->getIntervalLabel($this->interval, 'date_series.dt'),
+            $this->getIntervalGroup($this->interval, 'date_series.dt'),
         ];
 
         if ($this->groupBy !== null) {
@@ -63,7 +63,7 @@ trait WithTrendMetric
 
         $query
             ->when($this->groupBy !== null, fn (Builder|QueryBuilder $query) => $query->groupBy('grp')->orderBy('grp'))
-            ->groupBy('label')
+            ->groupBy(['grp_label', 'label'])
             ->orderBy('label');
 
         $this->query = $query->toRawSql();
@@ -97,7 +97,7 @@ trait WithTrendMetric
 
         $data->each(function ($datum) use ($inPercent, &$result) {
             $result['labels'][] = match ($this->interval) {
-                Interval::WEEK => CarbonImmutable::create(Str::substr($datum['label'], 0, 4))->isoWeek((int) Str::substr($datum['label'], 6))->translatedFormat($this->getLabelTimeFormat($this->interval)),
+                Interval::WEEK => $this->formatWeek($datum['label']),
                 Interval::DAY_OF_WEEK => $this->formatDayOfWeek($datum['label']),
                 default => CarbonImmutable::createFromFormat($this->getLabelTimeFormat($this->interval), $datum['label'])->locale($this->locale())->translatedFormat($this->getLabelTimeFormat($this->interval))
             };

@@ -10,15 +10,19 @@ beforeEach(function () {
     CarbonImmutable::setTestNow(CarbonImmutable::create(2025, 04, 10, 2, 38, 15));
 });
 
-it('calculates value metric no dates', function ($aggregate, $metric) {
+it('calculates value metric no dates', function ($db, $aggregate, $metric) {
+    createTestData($db);
+
     $builder = DB::table('test_data');
     $metrics = Metrics::query($builder);
     $value = $metrics->$aggregate('value')->value();
 
     expect($value)->toBe($metric, $metrics->query);
-})->with('aggregate values');
+})->with('databases', 'aggregate values');
 
-it('calculates value metric and previous with decrease', function () {
+it('calculates value metric and previous with decrease', function ($db) {
+    createTestData($db);
+
     $builder = DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -41,9 +45,11 @@ it('calculates value metric and previous with decrease', function () {
             'percentage' => 100,
         ],
     ], $metrics->query);
-});
+})->with('databases');
 
-it('casts floats correctly', function () {
+it('casts floats correctly', function ($db) {
+    createTestData($db);
+
     $builder = DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -60,7 +66,7 @@ it('casts floats correctly', function () {
     $value = $metrics->sum('value')->from(now()->subDays(7))->byDay()->value();
 
     expect($value)->toBeFloat();
-});
+})->with('databases');
 
 dataset('aggregate values', [
     [
