@@ -87,12 +87,12 @@ trait WithDates
         return $this;
     }
 
-    public function formatDatetime(): string
+    protected function formatDatetime(): string
     {
         return sprintf('%s.%s', $this->table, $this->dateColumn);
     }
 
-    public function bootWithDates(): void
+    protected function bootWithDates(): void
     {
         $this->between = [
             'from' => CarbonImmutable::now()->subMonth()->startOfMonth(),
@@ -108,7 +108,7 @@ trait WithDates
                 Interval::MINUTE => '%Y-%m-%d %H:%i',
                 Interval::HOUR => '%Y-%m-%d %H',
                 Interval::DAY => '%Y-%m-%d',
-                Interval::DAY_OF_WEEK => '%W',
+                Interval::DAY_OF_WEEK => '%w',
                 Interval::WEEK => match (now()->startOfWeek()->format('l')) {
                     'Sunday' => '%X-W%V',
                     default => '%x-W%v',
@@ -124,7 +124,7 @@ trait WithDates
                 Interval::MINUTE => 'YYYY-MM-DD HH24:MI',
                 Interval::HOUR => 'YYYY-MM-DD HH24',
                 Interval::DAY => 'YYYY-MM-DD',
-                Interval::DAY_OF_WEEK => 'Day',
+                Interval::DAY_OF_WEEK => 'ID',
                 Interval::WEEK => match (IntlCalendar::createInstance(null, $this->locale())->getFirstDayOfWeek()) {
                     IntlCalendar::DOW_SUNDAY => 'IYYY-IW',
                     default => 'IYYY-IW',
@@ -153,10 +153,31 @@ trait WithDates
             Interval::MINUTE => 'Y-m-d H:i',
             Interval::HOUR => 'Y-m-d H',
             Interval::DAY => 'Y-m-d',
-            Interval::DAY_OF_WEEK => 'l',
+            Interval::DAY_OF_WEEK => ($this->driver === 'pgsql') ? 'N' : 'w',
             Interval::WEEK => 'Y-\WW',
             Interval::MONTH => 'Y-m',
             Interval::YEAR => 'Y',
+        };
+    }
+
+    protected function formatDayOfWeek(int|string $day): string
+    {
+        if ($this->driver === 'pgsql') {
+            $day = match ((int) $day) {
+                7 => '0',
+                default => $day,
+            };
+        }
+
+        /** @var int<0,6> $day */
+        return match ((int) $day) {
+            0 => 'Sunday',
+            1 => 'Monday',
+            2 => 'Tuesday',
+            3 => 'Wednesday',
+            4 => 'Thursday',
+            5 => 'Friday',
+            6 => 'Saturday',
         };
     }
 

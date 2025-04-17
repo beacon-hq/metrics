@@ -2,14 +2,9 @@
 
 declare(strict_types=1);
 
-use Beacon\Metrics\Concerns\WithTrendMetric;
 use Beacon\Metrics\Metrics;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
-
-covers(
-    WithTrendMetric::class,
-);
 
 beforeEach(function () {
     CarbonImmutable::setTestNow(CarbonImmutable::create(2025, 04, 10, 2, 38, 15));
@@ -189,6 +184,33 @@ it('casts floats correctly', function () {
             2521.765431,
         ],
         'total' => 3361.765431,
+    ], $metrics->query);
+});
+
+it('returns percentage values', function () {
+    $builder = DB::table('test_data');
+    $metrics = Metrics::query($builder);
+
+    $trends = $metrics->sum('value')->from(CarbonImmutable::now()->subDays(7))->byDay()->trends(true);
+
+    expect($trends->toArray())->toBe([
+        'labels' => [
+            '2025-04-03',
+            '2025-04-06',
+            '2025-04-07',
+            '2025-04-08',
+            '2025-04-09',
+            '2025-04-10',
+        ],
+        'data' => [
+            2.86, // 90,
+            3.17, // 100,
+            3.49, // 110,
+            3.81, // 120,
+            13.33, // 420,
+            73.33, // 2310,
+        ],
+        'total' => 3150,
     ], $metrics->query);
 });
 

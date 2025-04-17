@@ -5,6 +5,8 @@ declare(strict_types=1);
 use Beacon\Metrics\HasMetrics;
 use Illuminate\Database\Eloquent\Model;
 
+covers(HasMetrics::class);
+
 it('expands models', function () {
     $model = new class extends Model
     {

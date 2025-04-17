@@ -17,42 +17,42 @@ trait WithMax
             ->between($from, $to);
     }
 
-    public function maxBySecond(string $column, int $count = 0): self
+    public function maxBySecond(string $column, int $count = 1): self
     {
         return $this->maxBy(Interval::SECOND, $column, $count);
     }
 
-    public function maxByMinute(string $column, int $count = 0): self
+    public function maxByMinute(string $column, int $count = 1): self
     {
         return $this->maxBy(Interval::MINUTE, $column, $count);
     }
 
-    public function maxByHour(string $column, int $count = 0): self
+    public function maxByHour(string $column, int $count = 1): self
     {
         return $this->maxBy(Interval::HOUR, $column, $count);
     }
 
-    public function maxByDay(string $column, int $count = 0): self
+    public function maxByDay(string $column, int $count = 1): self
     {
         return $this->maxBy(Interval::DAY, $column, $count);
     }
 
-    public function maxByDayOfTheWeek(string $column, int $count = 0): self
+    public function maxByDayOfWeek(string $column, int $count = 1): self
     {
         return $this->maxBy(Interval::DAY_OF_WEEK, $column, $count);
     }
 
-    public function maxByMonth(string $column, int $count = 0): self
+    public function maxByMonth(string $column, int $count = 1): self
     {
         return $this->maxBy(Interval::MONTH, $column, $count);
     }
 
-    public function maxByWeek(string $column, int $count = 0): self
+    public function maxByWeek(string $column, int $count = 1): self
     {
         return $this->maxBy(Interval::WEEK, $column, $count);
     }
 
-    public function maxByYear(string $column, int $count = 0): self
+    public function maxByYear(string $column, int $count = 1): self
     {
         return $this->maxBy(Interval::YEAR, $column, $count);
     }
@@ -64,7 +64,7 @@ trait WithMax
             ->from($date);
     }
 
-    protected function maxBy(Interval $period, string $column = 'id', int $count = 0): self
+    protected function maxBy(Interval $period, string $column = 'id', int $count = 1): self
     {
         return $this
             ->by($period, $count)

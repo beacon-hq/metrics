@@ -17,42 +17,42 @@ trait WithCount
             ->between($from, $to);
     }
 
-    public function countBySecond(string $column = 'id', int $count = 0): self
+    public function countBySecond(string $column = 'id', int $count = 1): self
     {
         return $this->countBy(Interval::SECOND, $column, $count);
     }
 
-    public function countByMinute(string $column = 'id', int $count = 0): self
+    public function countByMinute(string $column = 'id', int $count = 1): self
     {
         return $this->countBy(Interval::MINUTE, $column, $count);
     }
 
-    public function countByHour(string $column = 'id', int $count = 0): self
+    public function countByHour(string $column = 'id', int $count = 1): self
     {
         return $this->countBy(Interval::HOUR, $column, $count);
     }
 
-    public function countByDay(string $column = 'id', int $count = 0): self
+    public function countByDay(string $column = 'id', int $count = 1): self
     {
         return $this->countBy(Interval::DAY, $column, $count);
     }
 
-    public function countByDayOfTheWeek(string $column = 'id', int $count = 0): self
+    public function countByDayOfWeek(string $column = 'id', int $count = 1): self
     {
         return $this->countBy(Interval::DAY_OF_WEEK, $column, $count);
     }
 
-    public function countByMonth(string $column = 'id', int $count = 0): self
+    public function countByMonth(string $column = 'id', int $count = 1): self
     {
         return $this->countBy(Interval::MONTH, $column, $count);
     }
 
-    public function countByWeek(string $column = 'id', int $count = 0): self
+    public function countByWeek(string $column = 'id', int $count = 1): self
     {
         return $this->countBy(Interval::WEEK, $column, $count);
     }
 
-    public function countByYear(string $column = 'id', int $count = 0): self
+    public function countByYear(string $column = 'id', int $count = 1): self
     {
         return $this->countBy(Interval::YEAR, $column, $count);
     }
@@ -64,7 +64,7 @@ trait WithCount
             ->from($date);
     }
 
-    protected function countBy(Interval $period, string $column = 'id', int $count = 0): self
+    protected function countBy(Interval $period, string $column = 'id', int $count = 1): self
     {
         return $this
             ->by($period, $count)

@@ -96,11 +96,11 @@ trait WithTrendMetric
         }
 
         $data->each(function ($datum) use ($inPercent, &$result) {
-            if ($this->interval === Interval::WEEK) {
-                $result['labels'][] = CarbonImmutable::create(Str::substr($datum['label'], 0, 4))->isoWeek((int) Str::substr($datum['label'], 6))->translatedFormat($this->getLabelTimeFormat($this->interval));
-            } else {
-                $result['labels'][] = CarbonImmutable::createFromFormat($this->getLabelTimeFormat($this->interval), $datum['label'])->locale($this->locale())->translatedFormat($this->getLabelTimeFormat($this->interval));
-            }
+            $result['labels'][] = match ($this->interval) {
+                Interval::WEEK => CarbonImmutable::create(Str::substr($datum['label'], 0, 4))->isoWeek((int) Str::substr($datum['label'], 6))->translatedFormat($this->getLabelTimeFormat($this->interval)),
+                Interval::DAY_OF_WEEK => $this->formatDayOfWeek($datum['label']),
+                default => CarbonImmutable::createFromFormat($this->getLabelTimeFormat($this->interval), $datum['label'])->locale($this->locale())->translatedFormat($this->getLabelTimeFormat($this->interval))
+            };
 
             if ($inPercent) {
                 $result['data'][] = round((((int) ($datum['metric'])) / $result['total']) * 100, 2);
@@ -116,9 +116,9 @@ trait WithTrendMetric
 
     protected function getFormattedTrendsData(Collection $trendsData, bool $inPercent = false): Collection
     {
-        $trendsData = $trendsData->when($this->interval === Interval::DAY_OF_WEEK)->map(function ($datum) {
-            $datum['label'] = CarbonImmutable::parse($datum['label'])->translatedFormat('l');
-        });
+        // $trendsData = $trendsData->when($this->interval === Interval::DAY_OF_WEEK)->map(function ($datum) {
+        //     $datum['label'] = CarbonImmutable::parse($datum['label'])->translatedFormat('l');
+        // });
 
         if ($this->groupBy !== null) {
             return $trendsData->groupBy('grp')->map(function ($group) use ($inPercent) {

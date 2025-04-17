@@ -17,42 +17,42 @@ trait WithAverage
             ->between($from, $to);
     }
 
-    public function averageBySecond(string $column, int $count = 0): self
+    public function averageBySecond(string $column, int $count = 1): self
     {
         return $this->averageBy(Interval::SECOND, $column, $count);
     }
 
-    public function averageByMinute(string $column, int $count = 0): self
+    public function averageByMinute(string $column, int $count = 1): self
     {
         return $this->averageBy(Interval::MINUTE, $column, $count);
     }
 
-    public function averageByHour(string $column, int $count = 0): self
+    public function averageByHour(string $column, int $count = 1): self
     {
         return $this->averageBy(Interval::HOUR, $column, $count);
     }
 
-    public function averageByDay(string $column, int $count = 0): self
+    public function averageByDay(string $column, int $count = 1): self
     {
         return $this->averageBy(Interval::DAY, $column, $count);
     }
 
-    public function averageByDayOfTheWeek(string $column, int $count = 0): self
+    public function averageByDayOfWeek(string $column, int $count = 1): self
     {
         return $this->averageBy(Interval::DAY_OF_WEEK, $column, $count);
     }
 
-    public function averageByMonth(string $column, int $count = 0): self
+    public function averageByMonth(string $column, int $count = 1): self
     {
         return $this->averageBy(Interval::MONTH, $column, $count);
     }
 
-    public function averageByWeek(string $column, int $count = 0): self
+    public function averageByWeek(string $column, int $count = 1): self
     {
         return $this->averageBy(Interval::WEEK, $column, $count);
     }
 
-    public function averageByYear(string $column, int $count = 0): self
+    public function averageByYear(string $column, int $count = 1): self
     {
         return $this->averageBy(Interval::YEAR, $column, $count);
     }
@@ -64,7 +64,7 @@ trait WithAverage
             ->from($date);
     }
 
-    protected function averageBy(Interval $period, string $column = 'id', int $count = 0): self
+    protected function averageBy(Interval $period, string $column = 'id', int $count = 1): self
     {
         return $this
             ->by($period, $count)
