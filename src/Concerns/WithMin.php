@@ -17,6 +17,21 @@ trait WithMin
             ->between($from, $to);
     }
 
+    public function minBySecond(string $column, int $count = 0): self
+    {
+        return $this->minBy(Interval::SECOND, $column, $count);
+    }
+
+    public function minByMinute(string $column, int $count = 0): self
+    {
+        return $this->minBy(Interval::MINUTE, $column, $count);
+    }
+
+    public function minByHour(string $column, int $count = 0): self
+    {
+        return $this->minBy(Interval::HOUR, $column, $count);
+    }
+
     public function minByDay(string $column, int $count = 0): self
     {
         return $this->minBy(Interval::DAY, $column, $count);

@@ -17,6 +17,21 @@ trait WithMax
             ->between($from, $to);
     }
 
+    public function maxBySecond(string $column, int $count = 0): self
+    {
+        return $this->maxBy(Interval::SECOND, $column, $count);
+    }
+
+    public function maxByMinute(string $column, int $count = 0): self
+    {
+        return $this->maxBy(Interval::MINUTE, $column, $count);
+    }
+
+    public function maxByHour(string $column, int $count = 0): self
+    {
+        return $this->maxBy(Interval::HOUR, $column, $count);
+    }
+
     public function maxByDay(string $column, int $count = 0): self
     {
         return $this->maxBy(Interval::DAY, $column, $count);
