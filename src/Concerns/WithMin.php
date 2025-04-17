@@ -17,42 +17,42 @@ trait WithMin
             ->between($from, $to);
     }
 
-    public function minBySecond(string $column, int $count = 0): self
+    public function minBySecond(string $column, int $count = 1): self
     {
         return $this->minBy(Interval::SECOND, $column, $count);
     }
 
-    public function minByMinute(string $column, int $count = 0): self
+    public function minByMinute(string $column, int $count = 1): self
     {
         return $this->minBy(Interval::MINUTE, $column, $count);
     }
 
-    public function minByHour(string $column, int $count = 0): self
+    public function minByHour(string $column, int $count = 1): self
     {
         return $this->minBy(Interval::HOUR, $column, $count);
     }
 
-    public function minByDay(string $column, int $count = 0): self
+    public function minByDay(string $column, int $count = 1): self
     {
         return $this->minBy(Interval::DAY, $column, $count);
     }
 
-    public function minByDayOfTheWeek(string $column, int $count = 0): self
+    public function minByDayOfWeek(string $column, int $count = 1): self
     {
         return $this->minBy(Interval::DAY_OF_WEEK, $column, $count);
     }
 
-    public function minByMonth(string $column, int $count = 0): self
+    public function minByMonth(string $column, int $count = 1): self
     {
         return $this->minBy(Interval::MONTH, $column, $count);
     }
 
-    public function minByWeek(string $column, int $count = 0): self
+    public function minByWeek(string $column, int $count = 1): self
     {
         return $this->minBy(Interval::WEEK, $column, $count);
     }
 
-    public function minByYear(string $column, int $count = 0): self
+    public function minByYear(string $column, int $count = 1): self
     {
         return $this->minBy(Interval::YEAR, $column, $count);
     }
@@ -64,7 +64,7 @@ trait WithMin
             ->from($date);
     }
 
-    protected function minBy(Interval $period, string $column = 'id', int $count = 0): self
+    protected function minBy(Interval $period, string $column = 'id', int $count = 1): self
     {
         return $this
             ->by($period, $count)

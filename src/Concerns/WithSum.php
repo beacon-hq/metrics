@@ -17,42 +17,42 @@ trait WithSum
             ->between($from, $to);
     }
 
-    public function sumBySecond(string $column, int $count = 0): self
+    public function sumBySecond(string $column, int $count = 1): self
     {
         return $this->sumBy(Interval::SECOND, $column, $count);
     }
 
-    public function sumByMinute(string $column, int $count = 0): self
+    public function sumByMinute(string $column, int $count = 1): self
     {
         return $this->sumBy(Interval::MINUTE, $column, $count);
     }
 
-    public function sumByHour(string $column, int $count = 0): self
+    public function sumByHour(string $column, int $count = 1): self
     {
         return $this->sumBy(Interval::HOUR, $column, $count);
     }
 
-    public function sumByDay(string $column, int $count = 0): self
+    public function sumByDay(string $column, int $count = 1): self
     {
         return $this->sumBy(Interval::DAY, $column, $count);
     }
 
-    public function sumByDayOfTheWeek(string $column, int $count = 0): self
+    public function sumByDayOfWeek(string $column, int $count = 1): self
     {
         return $this->sumBy(Interval::DAY_OF_WEEK, $column, $count);
     }
 
-    public function sumByMonth(string $column, int $count = 0): self
+    public function sumByMonth(string $column, int $count = 1): self
     {
         return $this->sumBy(Interval::MONTH, $column, $count);
     }
 
-    public function sumByWeek(string $column, int $count = 0): self
+    public function sumByWeek(string $column, int $count = 1): self
     {
         return $this->sumBy(Interval::WEEK, $column, $count);
     }
 
-    public function sumByYear(string $column, int $count = 0): self
+    public function sumByYear(string $column, int $count = 1): self
     {
         return $this->sumBy(Interval::YEAR, $column, $count);
     }
@@ -64,7 +64,7 @@ trait WithSum
             ->from($date);
     }
 
-    protected function sumBy(Interval $period, string $column = 'id', int $count = 0): self
+    protected function sumBy(Interval $period, string $column = 'id', int $count = 1): self
     {
         return $this
             ->by($period, $count)

@@ -2,16 +2,9 @@
 
 declare(strict_types=1);
 
-use Beacon\Metrics\Concerns\WithAggregate;
-use Beacon\Metrics\Concerns\WithValueMetric;
 use Beacon\Metrics\Metrics;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
-
-covers(
-    WithValueMetric::class,
-    WithAggregate::class,
-);
 
 beforeEach(function () {
     CarbonImmutable::setTestNow(CarbonImmutable::create(2025, 04, 10, 2, 38, 15));
