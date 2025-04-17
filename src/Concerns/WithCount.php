@@ -17,6 +17,21 @@ trait WithCount
             ->between($from, $to);
     }
 
+    public function countBySecond(string $column = 'id', int $count = 0): self
+    {
+        return $this->countBy(Interval::SECOND, $column, $count);
+    }
+
+    public function countByMinute(string $column = 'id', int $count = 0): self
+    {
+        return $this->countBy(Interval::MINUTE, $column, $count);
+    }
+
+    public function countByHour(string $column = 'id', int $count = 0): self
+    {
+        return $this->countBy(Interval::HOUR, $column, $count);
+    }
+
     public function countByDay(string $column = 'id', int $count = 0): self
     {
         return $this->countBy(Interval::DAY, $column, $count);

@@ -17,6 +17,21 @@ trait WithSum
             ->between($from, $to);
     }
 
+    public function sumBySecond(string $column, int $count = 0): self
+    {
+        return $this->sumBy(Interval::SECOND, $column, $count);
+    }
+
+    public function sumByMinute(string $column, int $count = 0): self
+    {
+        return $this->sumBy(Interval::MINUTE, $column, $count);
+    }
+
+    public function sumByHour(string $column, int $count = 0): self
+    {
+        return $this->sumBy(Interval::HOUR, $column, $count);
+    }
+
     public function sumByDay(string $column, int $count = 0): self
     {
         return $this->sumBy(Interval::DAY, $column, $count);

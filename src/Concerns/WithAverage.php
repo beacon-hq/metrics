@@ -17,6 +17,21 @@ trait WithAverage
             ->between($from, $to);
     }
 
+    public function averageBySecond(string $column, int $count = 0): self
+    {
+        return $this->averageBy(Interval::SECOND, $column, $count);
+    }
+
+    public function averageByMinute(string $column, int $count = 0): self
+    {
+        return $this->averageBy(Interval::MINUTE, $column, $count);
+    }
+
+    public function averageByHour(string $column, int $count = 0): self
+    {
+        return $this->averageBy(Interval::HOUR, $column, $count);
+    }
+
     public function averageByDay(string $column, int $count = 0): self
     {
         return $this->averageBy(Interval::DAY, $column, $count);
