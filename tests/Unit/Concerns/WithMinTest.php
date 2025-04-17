@@ -8,7 +8,9 @@ use Illuminate\Support\Carbon;
 
 covers(WithMin::class);
 
-it('mins between', function () {
+it('mins between', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -19,9 +21,11 @@ it('mins between', function () {
         ->toBe('2025-04-06')
         ->and($trends['labels'][4])
         ->toBe('2025-04-10');
-});
+})->with('databases');
 
-it('mins from', function () {
+it('mins from', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -32,9 +36,11 @@ it('mins from', function () {
         ->toBe('2025-04-06')
         ->and($trends['labels'][4])
         ->toBe('2025-04-10');
-});
+})->with('databases');
 
-it('mins by second', function () {
+it('mins by second', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -111,14 +117,16 @@ it('mins by second', function () {
             40,
             230,
             20,
-            250,
+            10,
             260,
         ],
-        'total' => 20,
+        'total' => 10,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('mins by minute', function () {
+it('mins by minute', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -191,14 +199,16 @@ it('mins by minute', function () {
             40,
             190,
             20,
-            210,
+            10,
             220,
         ],
-        'total' => 20,
+        'total' => 10,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('mins by hour', function () {
+it('mins by hour', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -273,14 +283,16 @@ it('mins by hour', function () {
             40,
             150,
             20,
-            170,
+            10,
             180,
         ],
-        'total' => 20,
+        'total' => 10,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('mins by day', function () {
+it('mins by day', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -355,14 +367,16 @@ it('mins by day', function () {
             40,
             110,
             20,
-            130,
+            10,
             160,
         ],
-        'total' => 20,
+        'total' => 10,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('mins by day of the week', function () {
+it('mins by day of the week', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -397,16 +411,18 @@ it('mins by day of the week', function () {
             40,
             60,
             20,
-            80,
+            10,
             70,
             130,
             50,
         ],
-        'total' => 20,
+        'total' => 10,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('mins by week', function () {
+it('mins by week', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -429,7 +445,6 @@ it('mins by week', function () {
 
     expect($value->toArray())->toBe([
         'labels' => [
-            '2024-W01',
             '2024-W33',
             '2024-W35',
             '2024-W36',
@@ -443,6 +458,7 @@ it('mins by week', function () {
             '2024-W48',
             '2024-W50',
             '2024-W51',
+            '2025-W01',
             '2025-W02',
             '2025-W04',
             '2025-W05',
@@ -456,7 +472,6 @@ it('mins by week', function () {
             '2025-W15',
         ],
         'data' => [
-            140,
             340,
             320,
             310,
@@ -470,6 +485,7 @@ it('mins by week', function () {
             190,
             170,
             160,
+            140,
             40,
             110,
             100,
@@ -479,14 +495,16 @@ it('mins by week', function () {
             40,
             70,
             20,
-            90,
             10,
+            110,
         ],
         'total' => 10,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('mins by month', function () {
+it('mins by month', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -566,9 +584,11 @@ it('mins by month', function () {
         ],
         'total' => 10,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('mins by year', function () {
+it('mins by year', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -644,4 +664,4 @@ it('mins by year', function () {
         ],
         'total' => 10,
     ], $metrics->query);
-});
+})->with('databases');

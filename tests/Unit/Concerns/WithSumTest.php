@@ -8,7 +8,9 @@ use Illuminate\Support\Carbon;
 
 covers(WithSum::class);
 
-it('sums between', function () {
+it('sums between', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -19,9 +21,11 @@ it('sums between', function () {
         ->toBe('2025-04-06')
         ->and($trends['labels'][4])
         ->toBe('2025-04-10');
-});
+})->with('databases');
 
-it('sums from', function () {
+it('sums from', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -32,9 +36,11 @@ it('sums from', function () {
         ->toBe('2025-04-06')
         ->and($trends['labels'][4])
         ->toBe('2025-04-10');
-});
+})->with('databases');
 
-it('sums by second', function () {
+it('sums by second', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -111,14 +117,16 @@ it('sums by second', function () {
             260,
             230,
             260,
-            250,
+            260,
             260,
         ],
-        'total' => 5570,
+        'total' => 5580,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('sums by minute', function () {
+it('sums by minute', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -191,14 +199,16 @@ it('sums by minute', function () {
             220,
             190,
             220,
-            210,
+            220,
             1200,
         ],
-        'total' => 5940,
+        'total' => 5950,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('sums by hour', function () {
+it('sums by hour', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -273,14 +283,16 @@ it('sums by hour', function () {
             180,
             150,
             180,
-            170,
+            180,
             1980,
         ],
-        'total' => 6690,
+        'total' => 6700,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('sums by day', function () {
+it('sums by day', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -355,14 +367,16 @@ it('sums by day', function () {
             140,
             110,
             140,
-            420,
+            430,
             2310,
         ],
-        'total' => 7320,
+        'total' => 7330,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('sums by day of the week', function () {
+it('sums by day of the week', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -397,16 +411,18 @@ it('sums by day of the week', function () {
             820,
             750,
             530,
-            1010,
+            1020,
             3040,
             670,
             500,
         ],
-        'total' => 7320,
+        'total' => 7330,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('sums by week', function () {
+it('sums by week', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -429,7 +445,6 @@ it('sums by week', function () {
 
     expect($value->toArray())->toBe([
         'labels' => [
-            '2024-W01',
             '2024-W33',
             '2024-W35',
             '2024-W36',
@@ -443,6 +458,7 @@ it('sums by week', function () {
             '2024-W48',
             '2024-W50',
             '2024-W51',
+            '2025-W01',
             '2025-W02',
             '2025-W04',
             '2025-W05',
@@ -456,7 +472,6 @@ it('sums by week', function () {
             '2025-W15',
         ],
         'data' => [
-            140,
             340,
             320,
             310,
@@ -470,6 +485,7 @@ it('sums by week', function () {
             190,
             170,
             160,
+            140,
             170,
             110,
             100,
@@ -479,14 +495,16 @@ it('sums by week', function () {
             100,
             70,
             100,
-            190,
-            2970,
+            200,
+            2960,
         ],
         'total' => 7420,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('sums by month', function () {
+it('sums by month', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -566,9 +584,11 @@ it('sums by month', function () {
         ],
         'total' => 7480,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('sums by year', function () {
+it('sums by year', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -644,4 +664,4 @@ it('sums by year', function () {
         ],
         'total' => 7480,
     ], $metrics->query);
-});
+})->with('databases');

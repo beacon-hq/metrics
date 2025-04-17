@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 covers(HasMetrics::class);
 
-it('expands models', function () {
+it('expands models', function ($db) {
+    createTestData($db);
+
     $model = new class extends Model
     {
         use HasMetrics;
@@ -17,4 +19,4 @@ it('expands models', function () {
 
     $value = $model->metrics()->value();
     expect($value)->toBe(3);
-});
+})->with('databases');

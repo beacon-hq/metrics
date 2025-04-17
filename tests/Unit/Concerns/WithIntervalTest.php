@@ -7,7 +7,9 @@ use Beacon\Metrics\Metrics;
 
 covers(WithInterval::class);
 
-it('calculates by second', function () {
+it('calculates by second', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -84,14 +86,16 @@ it('calculates by second', function () {
             2,
             1,
             2,
-            1,
+            2,
             1,
         ],
-        'total' => 29,
+        'total' => 30,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('calculates by minute', function () {
+it('calculates by minute', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -164,14 +168,16 @@ it('calculates by minute', function () {
             2,
             1,
             2,
-            1,
+            2,
             5,
         ],
-        'total' => 31,
+        'total' => 32,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('calculates by hour', function () {
+it('calculates by hour', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -246,14 +252,16 @@ it('calculates by hour', function () {
             2,
             1,
             2,
-            1,
+            2,
             9,
         ],
-        'total' => 36,
+        'total' => 37,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('calculates by day', function () {
+it('calculates by day', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -328,14 +336,16 @@ it('calculates by day', function () {
             2,
             1,
             2,
-            3,
+            4,
             11,
         ],
-        'total' => 43,
+        'total' => 44,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('calculates by day of the week', function () {
+it('calculates by day of the week', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -370,16 +380,18 @@ it('calculates by day of the week', function () {
             5,
             5,
             4,
-            6,
+            7,
             17,
             3,
             3,
         ],
-        'total' => 43,
+        'total' => 44,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('calculates by week', function () {
+it('calculates by week', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -402,7 +414,6 @@ it('calculates by week', function () {
 
     expect($value->toArray())->toBe([
         'labels' => [
-            '2024-W01',
             '2024-W33',
             '2024-W35',
             '2024-W36',
@@ -416,6 +427,7 @@ it('calculates by week', function () {
             '2024-W48',
             '2024-W50',
             '2024-W51',
+            '2025-W01',
             '2025-W02',
             '2025-W04',
             '2025-W05',
@@ -452,14 +464,16 @@ it('calculates by week', function () {
             2,
             1,
             2,
-            2,
-            17,
+            3,
+            16,
         ],
         'total' => 46,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('calculates by month', function () {
+it('calculates by month', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -539,9 +553,11 @@ it('calculates by month', function () {
         ],
         'total' => 49,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('calculates by year', function () {
+it('calculates by year', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -617,4 +633,4 @@ it('calculates by year', function () {
         ],
         'total' => 49,
     ], $metrics->query);
-});
+})->with('databases');

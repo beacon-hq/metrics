@@ -3,22 +3,13 @@
 declare(strict_types=1);
 
 use Beacon\Metrics\Metrics;
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 covers(Metrics::class);
 
-beforeEach(function () {
-    $this->db = new DB;
-    $this->db->addConnection([
-        'driver' => 'sqlite',
-        'database' => ':memory:',
-    ]);
-    $this->db->setAsGlobal();
-    $this->db->bootEloquent();
-});
-
-test('it initializes correctly with query', function () {
+test('it initializes correctly with query', function ($db) {
+    createTestData($db);
     $builder = DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -27,4 +18,4 @@ test('it initializes correctly with query', function () {
     $model = new class extends Model {};
     $metrics = Metrics::query($model->query());
     expect($metrics)->toBeInstanceOf(Metrics::class);
-});
+})->with('databases');

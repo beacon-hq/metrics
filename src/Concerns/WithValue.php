@@ -17,9 +17,9 @@ trait WithValue
         }
 
         if ($decimalPlaces === -1) {
-            return (float) $number;
+            return round((float) $number, 4);
         }
 
-        return round($number, $decimalPlaces);
+        return round((float) $number, $decimalPlaces);
     }
 }

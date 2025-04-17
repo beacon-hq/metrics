@@ -5,10 +5,13 @@ declare(strict_types=1);
 use Beacon\Metrics\Concerns\WithAverage;
 use Beacon\Metrics\Metrics;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 covers(WithAverage::class);
 
-it('averages between', function () {
+it('averages between', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -19,9 +22,11 @@ it('averages between', function () {
         ->toBe('2025-04-06')
         ->and($trends['labels'][4])
         ->toBe('2025-04-10');
-});
+})->with('databases');
 
-it('averages from', function () {
+it('averages from', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -32,9 +37,11 @@ it('averages from', function () {
         ->toBe('2025-04-06')
         ->and($trends['labels'][4])
         ->toBe('2025-04-10');
-});
+})->with('databases');
 
-it('averages by second', function () {
+it('averages by second', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -111,14 +118,16 @@ it('averages by second', function () {
             130,
             230,
             130,
-            250,
+            130,
             260,
         ],
-        'total' => 192.06896551724137,
+        'total' => 186,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('averages by minute', function () {
+it('averages by minute', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -191,14 +200,16 @@ it('averages by minute', function () {
             110,
             190,
             110,
-            210,
+            110,
             240,
         ],
-        'total' => 191.61290322580646,
+        'total' => 185.9375,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('averages by hour', function () {
+it('averages by hour', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -273,14 +284,16 @@ it('averages by hour', function () {
             90,
             150,
             90,
-            170,
+            90,
             220,
         ],
-        'total' => 185.83333333333334,
+        'total' => 181.0811,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('averages by day', function () {
+it('averages by day', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -355,14 +368,16 @@ it('averages by day', function () {
             70,
             110,
             70,
-            140,
+            107.5,
             210,
         ],
-        'total' => 170.2325581395349,
+        'total' => 166.5909,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('averages by day of the week', function () {
+it('averages by day of the week', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -397,16 +412,18 @@ it('averages by day of the week', function () {
             164,
             150,
             132.5,
-            168.33333333333334,
-            178.8235294117647,
-            223.33333333333334,
-            166.66666666666666,
+            145.7143,
+            178.8235,
+            223.3333,
+            166.6667,
         ],
-        'total' => 170.2325581395349,
+        'total' => 166.5909,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('averages by week', function () {
+it('averages by week', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -425,11 +442,15 @@ it('averages by week', function () {
         ]);
     }
 
+    DB::commit();
+    // if ($db === 'mysql') {
+    //     xdebug_break();
+    // }
+
     $value = $metrics->from(now()->subWeeks(45))->averageByWeek('value')->trends();
 
     expect($value->toArray())->toBe([
         'labels' => [
-            '2024-W01',
             '2024-W33',
             '2024-W35',
             '2024-W36',
@@ -443,6 +464,7 @@ it('averages by week', function () {
             '2024-W48',
             '2024-W50',
             '2024-W51',
+            '2025-W01',
             '2025-W02',
             '2025-W04',
             '2025-W05',
@@ -456,7 +478,6 @@ it('averages by week', function () {
             '2025-W15',
         ],
         'data' => [
-            140,
             340,
             320,
             310,
@@ -470,6 +491,7 @@ it('averages by week', function () {
             190,
             170,
             160,
+            140,
             85,
             110,
             100,
@@ -479,14 +501,16 @@ it('averages by week', function () {
             50,
             70,
             50,
-            95,
-            174.7058823529412,
+            66.6667,
+            185,
         ],
-        'total' => 161.30434782608697,
+        'total' => 161.3043,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('averages by month', function () {
+it('averages by month', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -564,11 +588,13 @@ it('averages by month', function () {
             55,
             175,
         ],
-        'total' => 152.6530612244898,
+        'total' => 152.6531,
     ], $metrics->query);
-});
+})->with('databases');
 
-it('averages by year', function () {
+it('averages by year', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -642,6 +668,6 @@ it('averages by year', function () {
             17.5,
             150,
         ],
-        'total' => 152.6530612244898,
+        'total' => 152.6531,
     ], $metrics->query);
-});
+})->with('databases');

@@ -8,7 +8,9 @@ use Illuminate\Support\Facades\DB;
 
 covers(WithGroup::class);
 
-it('groups value by column name', function () {
+it('groups value by column name', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -19,9 +21,11 @@ it('groups value by column name', function () {
         'category2' => 1260,
         'category3' => 1080,
     ]);
-});
+})->with('databases');
 
-it('groups value by expression', function () {
+it('groups value by expression', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -32,9 +36,11 @@ it('groups value by expression', function () {
         'CATEGORY2' => 1260,
         'CATEGORY3' => 1080,
     ]);
-});
+})->with('databases');
 
-it('groups trends by column name', function () {
+it('groups trends by column name', function ($db) {
+    createTestData($db);
+
     $builder = \DB::table('test_data');
     $metrics = Metrics::query($builder);
 
@@ -99,4 +105,4 @@ it('groups trends by column name', function () {
             'total' => 1080,
         ],
     ]);
-});
+})->with('databases');
