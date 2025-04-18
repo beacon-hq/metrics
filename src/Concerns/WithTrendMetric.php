@@ -116,10 +116,6 @@ trait WithTrendMetric
 
     protected function getFormattedTrendsData(Collection $trendsData, bool $inPercent = false): Collection
     {
-        // $trendsData = $trendsData->when($this->interval === Interval::DAY_OF_WEEK)->map(function ($datum) {
-        //     $datum['label'] = CarbonImmutable::parse($datum['label'])->translatedFormat('l');
-        // });
-
         if ($this->groupBy !== null) {
             return $trendsData->groupBy('grp')->map(function ($group) use ($inPercent) {
                 return $this->formatTrends($group, $inPercent);
