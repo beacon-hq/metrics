@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Beacon\Metrics\Metrics;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 beforeEach(function () {
@@ -256,6 +257,22 @@ it('returns percentage values', function ($db) {
         ],
         'total' => 3150,
     ], $metrics->query);
+})->with('databases');
+
+it('can use model queries', function ($db) {
+    createTestData($db);
+
+    $model = new class extends Model
+    {
+        protected $table = 'test_data';
+    };
+
+    $metrics = Metrics::query(
+        $model::query()
+            ->where('value', '>', 100)
+    );
+
+    expect($metrics->all()->min('value')->byDay()->trends()->get('labels'))->toHaveCount(4);
 })->with('databases');
 
 dataset('daily trends', [
