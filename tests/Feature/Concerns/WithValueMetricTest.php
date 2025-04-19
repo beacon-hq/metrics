@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Beacon\Metrics\Exceptions\InvalidDateRangeException;
 use Beacon\Metrics\Metrics;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 beforeEach(function () {
@@ -87,6 +88,44 @@ it('calculates value over all data with missing', function ($db) {
 
     $metrics->count()->all()->withPrevious()->value();
 })->with('databases')->throws(InvalidDateRangeException::class);
+
+it('can use model queries', function ($db) {
+    createTestData($db);
+
+    $model = new class extends Model
+    {
+        protected $table = 'test_data';
+    };
+
+    $metrics = Metrics::query(
+        $model::query()
+            ->where('value', '>', 100)
+    );
+
+    $value = $metrics->all()->min('value')->byDay()->value();
+    expect($value)->toBe(110, $metrics->query);
+})->with('databases');
+
+it('can use model queries with group', function ($db) {
+    createTestData($db);
+
+    $model = new class extends Model
+    {
+        protected $table = 'test_data';
+    };
+
+    $metrics = Metrics::query(
+        $model::query()
+            ->where('value', '>', 100)
+    );
+
+    $value = $metrics->all()->min('value')->byDay()->groupBy('category')->value();
+    expect($value->toArray())->toBe([
+        'category1' => 130,
+        'category2' => 110,
+        'category3' => 120,
+    ], $metrics->query);
+})->with('databases');
 
 dataset('aggregate values', [
     [

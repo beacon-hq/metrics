@@ -15,10 +15,12 @@ trait WithTrendMetric
 {
     public function trends(bool $inPercent = false): Collection
     {
-        $baseQuery = DB::query()
+        // @phpstan-ignore method.notFound
+        $baseQuery = $this->builder->getConnection()->query()
             ->select(DB::raw($this->formatDatetimeFloor($this->between['from']).' AS dt'));
 
-        $recursiveQuery = (clone $this->builder)->newQuery()->select(DB::raw($this->getIntervalSequence('date_series.dt').' AS dt'))
+        // @phpstan-ignore method.notFound
+        $recursiveQuery = $this->builder->getConnection()->query()->select(DB::raw($this->getIntervalSequence('date_series.dt').' AS dt'))
             ->where(
                 DB::raw($this->getIntervalSequence('date_series.dt')),
                 '<=',
@@ -34,10 +36,16 @@ trait WithTrendMetric
 
         $builder = $baseQuery->union($recursiveQuery, $this->driver === 'sqlite');
 
-        /** @var \Staudenmeir\LaravelCte\Query\Builder $query */
-        // @phpstan-ignore method.notFound
-        $query = (clone $this->builder)
-            ->withRecursiveExpression('date_series', $builder, ['dt']);
+        if ($this->builder instanceof \Illuminate\Database\Eloquent\Builder) {
+            // @phpstan-ignore method.notFound
+            $query = (clone $this->builder)
+                ->toBase()
+                ->withRecursiveExpression('date_series', $builder, ['dt']);
+        } else {
+            // @phpstan-ignore method.notFound
+            $query = (clone $this->builder)
+                ->withRecursiveExpression('date_series', $builder, ['dt']);
+        }
 
         $columns = [
             $this->selectData(),
