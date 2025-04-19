@@ -151,6 +151,32 @@ it('calculates daily trends every other month with missing data', function ($db,
     expect($trends->toArray())->toBe($expected, $metrics->query);
 })->with('databases', 'every other month trends with missing data');
 
+it('calculates daily trends over all data', function ($db) {
+    createTestData($db);
+    $builder = DB::table('test_data');
+    $metrics = Metrics::query($builder);
+
+    $trends = $metrics->count()->all()->byDay()->trends();
+
+    expect($trends->get('labels'))
+        ->toHaveCount(14)
+        ->and($trends->get('total'))
+        ->toBe(26);
+})->with('databases');
+
+it('calculates daily trends over all data with missing', function ($db) {
+    createTestData($db);
+    $builder = DB::table('test_data');
+    $metrics = Metrics::query($builder);
+
+    $trends = $metrics->count()->all()->fillMissing()->byDay()->trends();
+
+    expect($trends->get('labels'))
+        ->toHaveCount(426)
+        ->and($trends->get('total'))
+        ->toBe(26);
+})->with('databases');
+
 it('casts floats correctly', function ($db) {
     createTestData($db);
     $builder = DB::table('test_data');

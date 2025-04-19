@@ -118,6 +118,7 @@ export default withMermaid(defineVersionedConfig({
               {"text": "Between", "link": "/between"},
               {"text": "From", "link": "/from"},
               {"text": "Period", "link": "/period"},
+              {"text": "All", "link": "/all"},
           ]
         },
         {
