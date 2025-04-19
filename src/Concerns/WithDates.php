@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 trait WithDates
 {
     /**
-     * @var array{from: CarbonImmutable, to: CarbonImmutable}
+     * @var array{from: ?CarbonImmutable, to: CarbonImmutable}
      */
     protected array $between;
 
@@ -77,6 +77,13 @@ trait WithDates
     public function from(CarbonInterface $date): self
     {
         return $this->between(CarbonImmutable::create($date), CarbonImmutable::now());
+    }
+
+    public function all(): self
+    {
+        $this->between = ['from' => null, 'to' => CarbonImmutable::now()];
+
+        return $this;
     }
 
     public function dateColumn(string $column): self

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Beacon\Metrics\Exceptions\InvalidDateRangeException;
 use Beacon\Metrics\Metrics;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
@@ -67,6 +68,25 @@ it('casts floats correctly', function ($db) {
 
     expect($value)->toBeFloat();
 })->with('databases');
+
+it('calculates value over all data', function ($db) {
+    createTestData($db);
+    $builder = DB::table('test_data');
+    $metrics = Metrics::query($builder);
+
+    $value = $metrics->count()->all()->value();
+
+    expect($value)
+        ->toBe(26);
+})->with('databases');
+
+it('calculates value over all data with missing', function ($db) {
+    createTestData($db);
+    $builder = DB::table('test_data');
+    $metrics = Metrics::query($builder);
+
+    $metrics->count()->all()->withPrevious()->value();
+})->with('databases')->throws(InvalidDateRangeException::class);
 
 dataset('aggregate values', [
     [

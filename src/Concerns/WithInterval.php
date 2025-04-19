@@ -55,8 +55,27 @@ trait WithInterval
         return $this->by(Interval::YEAR, $count);
     }
 
-    public function formatDatetimeFloor(CarbonImmutable $date, bool $cast = true): string
+    public function formatDatetimeFloor(?CarbonImmutable $date, bool $cast = true): string
     {
+        if ($date === null) {
+            $minDate = (clone $this->builder)
+                ->selectRaw(
+                    $this->parseDate(
+                        $this->interval,
+                        sprintf('MIN(%s.%s)', $this->table, $this->dateColumn)
+                    ).' as min_date'
+                )
+                ->limit(1)
+                ->pluck('min_date')
+                ->first();
+
+            $date = CarbonImmutable::parse($minDate);
+
+            if ($this->between['from'] === null) {
+                $this->between['from'] = $date;
+            }
+        }
+
         $date = match ($this->interval) {
             Interval::SECOND => $date->format('Y-m-d H:i:s'),
             Interval::MINUTE => $date->format('Y-m-d H:i:00'),

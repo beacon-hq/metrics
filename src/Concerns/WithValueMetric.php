@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Beacon\Metrics\Concerns;
 
+use Beacon\Metrics\Exceptions\InvalidDateRangeException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Collection;
@@ -55,6 +56,12 @@ trait WithValueMetric
 
     protected function valueWithPrevious(): Collection
     {
+        if ($this->between['from'] === null) {
+            throw new InvalidDateRangeException(
+                'You cannot use the withPrevious() method when using the all() method.'
+            );
+        }
+
         $interval = $this->between['from']->diff($this->between['to']);
         $previous = (clone $this)->withPrevious(false)->between($this->between['from']->sub($interval), $this->between['to']->sub((clone $interval)->addSeconds(1)))->value();
 
