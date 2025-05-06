@@ -19,7 +19,7 @@
         "illuminate/support": "^10|^11|^12",
         "nesbot/carbon": "^3.8",
         "ramsey/conventional-commits": "^1.5.1",
-        "staudenmeir/laravel-cte": "^1.9"
+        "staudenmeir/laravel-cte": "^1.9 || ^12.0"
     },
     "require-dev": {
         "captainhook/captainhook-phar": "^5.23",
