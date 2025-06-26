@@ -443,9 +443,6 @@ it('averages by week', function ($db) {
     }
 
     DB::commit();
-    // if ($db === 'mysql') {
-    //     xdebug_break();
-    // }
 
     $value = $metrics->from(now()->subWeeks(45))->averageByWeek('value')->trends();
 

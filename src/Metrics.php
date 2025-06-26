@@ -6,6 +6,7 @@ namespace Beacon\Metrics;
 
 use Beacon\Metrics\Concerns\WithAggregate;
 use Beacon\Metrics\Concerns\WithAverage;
+use Beacon\Metrics\Concerns\WithConditional;
 use Beacon\Metrics\Concerns\WithCount;
 use Beacon\Metrics\Concerns\WithDates;
 use Beacon\Metrics\Concerns\WithFillMissingData;
@@ -13,6 +14,7 @@ use Beacon\Metrics\Concerns\WithGroup;
 use Beacon\Metrics\Concerns\WithInterval;
 use Beacon\Metrics\Concerns\WithMax;
 use Beacon\Metrics\Concerns\WithMin;
+use Beacon\Metrics\Concerns\WithProjection;
 use Beacon\Metrics\Concerns\WithSum;
 use Beacon\Metrics\Concerns\WithTable;
 use Beacon\Metrics\Concerns\WithTrendMetric;
@@ -33,11 +35,14 @@ class Metrics
     use WithInterval;
     use WithMax;
     use WithMin;
+    use WithProjection;
     use WithSum;
     use WithTable;
     use WithTrendMetric;
     use WithValue;
     use WithValueMetric;
+
+    protected array $projections = [];
 
     protected string $column = 'id';
 
