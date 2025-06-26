@@ -15,10 +15,12 @@ hero:
 features:
   - title: Aggregate Values
     details: Simple value metrics (e.g. count or average for a month)
+  - title: Trends
+    details: Calculate data over time, whether it's minutes, days, months, or years, or anything in between.
   - title: Previous Period Comparison
     details: Compare values between periods (e.g. count for this month and last month).
-  - title: Trends
-    details: Calculate data over time, whether it's minutes, days, months, or years, or anything in between.  
+  - title: Projections
+    details: Predict when you will reach a threshold, or what the value will be at a certain point in the future.
 ---
 
 ## What is Beacon Metrics?

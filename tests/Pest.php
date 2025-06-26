@@ -40,7 +40,7 @@ pest()->extend(TestCase::class)->in('Unit', 'Feature')
         Config::set('database.connections.pgsql', [
             'driver' => 'pgsql',
             'host' => env('POSTGRES_HOST', '127.0.0.1'),
-            'port' => env('POSTGRES_PORT', '5432'),
+            'port' => env('POSTGRES_PORT', '5433'),
             'database' => env('POSTGRES_DATABASE', 'postgres'),
             'username' => env('POSTGRES_USERNAME', 'postgres'),
             'password' => env('POSTGRES_PASSWORD', 'postgres'),
@@ -63,9 +63,8 @@ dataset('databases', function () {
     return $databases;
 });
 
-function createTestData($db)
+function createTestSchema($db)
 {
-    CarbonImmutable::setTestNow(CarbonImmutable::create(2025, 04, 10, 2, 38, 15));
     Config::set('database.default', $db);
 
     DB::getSchemaBuilder()->dropAllTables();
@@ -80,6 +79,13 @@ function createTestData($db)
         $table->index(['category', 'created_at']);
         $table->index('created_at');
     });
+}
+
+function createTestData($db)
+{
+    CarbonImmutable::setTestNow(CarbonImmutable::create(2025, 04, 10, 2, 38, 15));
+
+    createTestSchema($db);
 
     $dates = [
         // Last year data

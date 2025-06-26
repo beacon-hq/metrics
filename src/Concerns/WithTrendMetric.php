@@ -79,7 +79,10 @@ trait WithTrendMetric
         $results = $query->get();
         $trendsData = $results->map(fn (object $datum) => (array) $datum);
 
-        return $this->getFormattedTrendsData($trendsData, $inPercent);
+        $formattedData = $this->getFormattedTrendsData($trendsData, $inPercent);
+
+        // Include projections if any
+        return $this->includeProjections($formattedData);
     }
 
     protected function formatTrends(Collection $data, bool $inPercent = false): Collection
@@ -131,5 +134,52 @@ trait WithTrendMetric
         }
 
         return $this->formatTrends($trendsData, $inPercent);
+    }
+
+    /**
+     * Include projections in the trends result.
+     *
+     * @param  Collection  $trends  The trends data
+     * @return Collection The trends data with projections
+     */
+    protected function includeProjections(Collection $trends): Collection
+    {
+        // Calculate projections if we have projection parameters set
+        if ($this->projectionTargetValue !== null || $this->projectionTargetDate !== null) {
+            $this->calculateProjections($trends);
+        }
+
+        if (empty($this->projections)) {
+            return $trends;
+        }
+
+        // If we have grouped data, we need to handle each group separately
+        if ($trends->first() instanceof Collection) {
+            return $trends->map(function (Collection $groupTrend, $key) {
+                $result = $groupTrend->toArray();
+
+                if (isset($this->projections['when'][$key])) {
+                    $result['projections']['when'] = $this->projections['when'][$key];
+                }
+
+                if (isset($this->projections['date'][$key])) {
+                    $result['projections']['date'] = $this->projections['date'][$key];
+                }
+
+                return collect($result);
+            });
+        }
+
+        $result = $trends->toArray();
+
+        if (isset($this->projections['when'])) {
+            $result['projections']['when'] = $this->projections['when'];
+        }
+
+        if (isset($this->projections['date'])) {
+            $result['projections']['date'] = $this->projections['date'];
+        }
+
+        return collect($result);
     }
 }
