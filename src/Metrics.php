@@ -6,6 +6,7 @@ namespace Beacon\Metrics;
 
 use Beacon\Metrics\Concerns\WithAggregate;
 use Beacon\Metrics\Concerns\WithAverage;
+use Beacon\Metrics\Concerns\WithConditional;
 use Beacon\Metrics\Concerns\WithCount;
 use Beacon\Metrics\Concerns\WithDates;
 use Beacon\Metrics\Concerns\WithFillMissingData;
@@ -26,6 +27,7 @@ class Metrics
 {
     use WithAggregate;
     use WithAverage;
+    use WithConditional;
     use WithCount;
     use WithDates;
     use WithFillMissingData;
