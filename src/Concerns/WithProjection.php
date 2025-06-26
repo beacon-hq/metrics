@@ -120,7 +120,7 @@ trait WithProjection
         $lastDate = CarbonImmutable::parse(end($labels));
         $intervalsBetween = $this->calculateIntervalsBetween($lastDate, $targetDate);
 
-        $currentValue = end($data);
+        $currentValue = array_sum($data);
         $projectedValue = $currentValue + ($rateOfChange * $intervalsBetween);
 
         $confidence = $this->calculateConfidence($data);
@@ -135,11 +135,30 @@ trait WithProjection
     protected function calculateRateOfChange(array $data): float
     {
         $changes = [];
+        $weights = [];
+        $totalWeight = 0;
+
         for ($i = 1; $i < count($data); $i++) {
-            $changes[] = $data[$i] - $data[$i - 1];
+            $change = $data[$i] - $data[$i - 1];
+            $weight = $i; // Weight increases with recency
+            $changes[] = $change;
+            $weights[] = $weight;
+            $totalWeight += $weight;
         }
 
-        return ! empty($changes) ? array_sum($changes) / count($changes) : 0;
+        if (empty($changes)) {
+            return 0;
+        }
+
+        $weightedSum = 0;
+        for ($i = 0; $i < count($changes); $i++) {
+            $weightedSum += $changes[$i] * $weights[$i];
+        }
+
+        $rate = $weightedSum / $totalWeight;
+
+        // Ensure rate is not negative
+        return max(0, $rate);
     }
 
     protected function calculateIntervalsBetween(CarbonInterface $from, CarbonInterface $to): float
