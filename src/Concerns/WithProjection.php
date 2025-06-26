@@ -36,31 +36,33 @@ trait WithProjection
         if ($this->projectionTargetValue !== null) {
             if ($trendsData->first() instanceof Collection) {
                 $this->projections['when'] = $trendsData->map(function (Collection $groupTrend) {
-                    return $this->calculateProjectionToValue($groupTrend, $this->projectionTargetValue);
+                    return $this->calculateProjectedDateForValue($groupTrend, $this->projectionTargetValue);
                 });
             } else {
-                $this->projections['when'] = $this->calculateProjectionToValue($trendsData, $this->projectionTargetValue);
+                $this->projections['when'] = $this->calculateProjectedDateForValue($trendsData, $this->projectionTargetValue);
             }
         }
 
         if ($this->projectionTargetDate !== null) {
             if ($trendsData->first() instanceof Collection) {
                 $this->projections['date'] = $trendsData->map(function (Collection $groupTrend) {
-                    return $this->calculateProjectionToDate($groupTrend, $this->projectionTargetDate);
+                    $currentTotal = array_sum($groupTrend['data']);
+
+                    return $this->calculateProjectedTotalForDate($groupTrend, $currentTotal, $this->projectionTargetDate);
                 });
             } else {
-                // Store the projection in the result
-                $this->projections['date'] = $this->calculateProjectionToDate($trendsData, $this->projectionTargetDate);
+                $currentTotal = array_sum($trendsData['data']);
+                $this->projections['date'] = $this->calculateProjectedTotalForDate($trendsData, $currentTotal, $this->projectionTargetDate);
             }
         }
     }
 
-    protected function calculateProjectionToValue(Collection $trend, float|int $targetValue): array
+    protected function calculateProjectedDateForValue(Collection $trend, float|int $targetValue): array
     {
         $labels = $trend['labels'];
         $data = $trend['data'];
 
-        if (count($data) < 2) {
+        if (count($labels) < 2 || count($labels) !== count($data)) {
             return [
                 'target_value' => $targetValue,
                 'projected_date' => null,
@@ -68,32 +70,24 @@ trait WithProjection
             ];
         }
 
-        $rateOfChange = $this->calculateRateOfChange($data);
+        $normalizedData = $this->normalizeData($labels, $data);
 
-        if ((int) $rateOfChange === 0) {
+        $currentTotal = array_sum($normalizedData);
+        if ($currentTotal >= $targetValue) {
             return [
                 'target_value' => $targetValue,
                 'projected_date' => null,
-                'confidence' => 0,
+                'confidence' => 100,
             ];
         }
 
-        $currentValue = end($data);
-        $valueChange = $targetValue - $currentValue;
-        $intervalsToTarget = $valueChange / $rateOfChange;
+        $averageIncrement = $currentTotal / count($normalizedData);
 
-        if ($intervalsToTarget < 0) {
-            return [
-                'target_value' => $targetValue,
-                'projected_date' => null,
-                'confidence' => 0,
-            ];
-        }
+        $intervals = ($targetValue - $currentTotal) / $averageIncrement;
 
         $lastDate = CarbonImmutable::parse(end($labels));
-        $projectedDate = $this->addIntervals($lastDate, $intervalsToTarget);
-
-        $confidence = $this->calculateConfidence($data);
+        $projectedDate = $this->addIntervals($lastDate, $intervals);
+        $confidence = $this->calculateConfidence($normalizedData);
 
         return [
             'target_value' => $targetValue,
@@ -102,44 +96,43 @@ trait WithProjection
         ];
     }
 
-    protected function calculateProjectionToDate(Collection $trend, CarbonInterface $targetDate): array
+    protected function calculateProjectedTotalForDate(Collection $trend, int|float $currentTotal, CarbonInterface $targetDate): array
     {
         $labels = $trend['labels'];
         $data = $trend['data'];
 
-        if (count($data) < 2) {
+        if (count($labels) < 2 || count($labels) !== count($data)) {
             return [
                 'target_date' => $targetDate->toDateTimeString(),
-                'projected_value' => null,
+                'projected_total' => null,
                 'confidence' => 0,
             ];
         }
 
-        $rateOfChange = $this->calculateRateOfChange($data);
+        $normalizedData = $this->normalizeData($labels, $data);
+
+        $sum = array_sum($normalizedData);
+        $count = count($normalizedData);
+        $averageIncrement = $sum / $count;
 
         $lastDate = CarbonImmutable::parse(end($labels));
-        $intervalsBetween = $this->calculateIntervalsBetween($lastDate, $targetDate);
+        $intervalsToTarget = $this->calculateIntervalsBetween($lastDate, $targetDate);
 
-        $currentValue = end($data);
-        $projectedValue = $currentValue + ($rateOfChange * $intervalsBetween);
+        $projectedIncrement = 0;
+        $minGrowth = 0.1;
+        for ($i = 1; $i <= $intervalsToTarget; $i++) {
+            $decay = 1 / (1 + $i / 30);
+            $increment = max($averageIncrement * $decay, $minGrowth);
+            $projectedIncrement += $increment;
+        }
 
-        $confidence = $this->calculateConfidence($data);
+        $confidence = $this->calculateConfidence($normalizedData);
 
         return [
             'target_date' => $targetDate->toDateTimeString(),
-            'projected_value' => $projectedValue,
+            'projected_total' => round($currentTotal + $projectedIncrement),
             'confidence' => $confidence,
         ];
-    }
-
-    protected function calculateRateOfChange(array $data): float
-    {
-        $changes = [];
-        for ($i = 1; $i < count($data); $i++) {
-            $changes[] = $data[$i] - $data[$i - 1];
-        }
-
-        return ! empty($changes) ? array_sum($changes) / count($changes) : 0;
     }
 
     protected function calculateIntervalsBetween(CarbonInterface $from, CarbonInterface $to): float
@@ -159,7 +152,7 @@ trait WithProjection
 
     protected function addIntervals(CarbonInterface $date, float $intervals): CarbonInterface
     {
-        $wholeIntervals = floor($intervals);
+        $wholeIntervals = ceil($intervals);
         $partialInterval = $intervals - $wholeIntervals;
 
         $newDate = match ($this->interval) {
@@ -178,9 +171,9 @@ trait WithProjection
                 Interval::MINUTE => 60,
                 Interval::HOUR => 3600,
                 Interval::DAY, Interval::DAY_OF_WEEK => 86400,
-                Interval::WEEK => 604800, // 7 days
-                Interval::MONTH => 2592000, // 30 days (approximate)
-                Interval::YEAR => 31536000, // 365 days (approximate)
+                Interval::WEEK => 604800,
+                Interval::MONTH => 2592000,
+                Interval::YEAR => 31536000,
             };
 
             $newDate = $newDate->addSeconds((int) ($partialInterval * $secondsInInterval));
@@ -211,5 +204,31 @@ trait WithProjection
         $consistencyFactor = $mean !== 0 ? min(1, 1 / (1 + abs($stdDev / $mean))) : 0;
 
         return (int) (($dataPointsFactor * 0.4 + $consistencyFactor * 0.6) * 100);
+    }
+
+    protected function normalizeData($labels, $data): array
+    {
+        $start = CarbonImmutable::parse($labels[0]);
+        $end = CarbonImmutable::parse($labels[count($labels) - 1]);
+
+        $normalizedData = [];
+        $dataByDate = array_combine($labels, $data);
+        $date = $start->copy();
+
+        while ($date->lte($end)) {
+            $dateStr = $date->format($this->getLabelTimeFormat($this->interval));
+            $normalizedData[] = $dataByDate[$dateStr] ?? 0;
+            $date = match ($this->interval) {
+                Interval::SECOND => $date->addSecond(),
+                Interval::MINUTE => $date->addMinute(),
+                Interval::HOUR => $date->addHour(),
+                Interval::DAY, Interval::DAY_OF_WEEK => $date->addDay(),
+                Interval::WEEK => $date->addWeek(),
+                Interval::MONTH => $date->addMonth(),
+                Interval::YEAR => $date->addYear(),
+            };
+        }
+
+        return $normalizedData;
     }
 }
