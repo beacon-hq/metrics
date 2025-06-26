@@ -28,6 +28,7 @@ class Metrics
 {
     use WithAggregate;
     use WithAverage;
+    use WithConditional;
     use WithCount;
     use WithDates;
     use WithFillMissingData;

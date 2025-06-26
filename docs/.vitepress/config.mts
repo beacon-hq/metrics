@@ -128,6 +128,10 @@ export default withMermaid(defineVersionedConfig({
               {"text": "Value Metrics", "link": "/value-metrics"},
               {"text": "Trend Metrics", "link": "/trend-metrics"},
           ]
+        },
+        {
+          "text": "Conditional Statements",
+          "link": "/conditional"
         }
       ]
     },
