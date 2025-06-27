@@ -139,7 +139,7 @@ This will add a `projections` key to the result with a `date` subkey containing:
     'projections' => [
         'date' => [
             'target_date' => '2025-05-10 00:00:00', // The target date
-            'projected_value' => 850.5, // The projected value at the target date
+            'projected_total' => 850.5, // The projected value at the target date
             'confidence' => 78, // Confidence level (0-100) based on data consistency
         ],
     ],
