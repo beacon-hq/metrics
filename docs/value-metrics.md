@@ -15,7 +15,21 @@ $value = Metrics::query(MyModel::query())
     ->value();
 ```
 
-This will return a single `int` or `float` value, depending on the metric being calculated.
+This will return a `ValueMetric` object with a `value` property containing a single `int` or `float` value, depending on the metric being calculated.
+
+The `ValueMetric` object looks like this:
+
+```php
+ValueMetric<{
+    'value' => float|int, // the value for the current period
+    'previous' => [
+        'value' => float|int, // the value for the previous period
+        'type' => PreviousType::class, // increase, decrease, or identical
+        'difference' => float|int, // the difference between the two values
+        'percentage' => float|int, // the percentage difference between the two values
+    ],
+}>
+```
 
 ## Grouping
 
@@ -25,20 +39,25 @@ You can group your metrics by a column using the `->groupBy()` method. This will
 use App\Models\MyModel;
 use Beacon\Metrics\Metrics;
 
-$metrics = Metrics::query(MyModel::query())
+$value = Metrics::query(MyModel::query())
     ->...
     ->groupBy('type')
     ->value();
 ```
 
-This will return a Laravel `Collection` object with the group value as keys, and the aggregate value as the value. For example,
-as an array it might look like the following:
+This will return a `ValueMetricCollection` object with the group value as keys, and the aggregate `ValueMetric` objects as the value:
+
+```php
+ValueMetricCollection<mixed, ValueMetric>
+```
+
+For example, as an array it might look like the following:
 
 ```php
 [
-    'shirts' => 345,
-    'pants' => 123,
-    'shoes' => 456,
+    'shirts' => ['value' => 345],
+    'pants' => ['value' => 123],
+    'shoes' => ['value' => 456],
 ]
 ```
 
@@ -56,18 +75,18 @@ $metrics = Metrics::query(MyModel::query())
     ->value();
 ``` 
 
-This will result in a Laravel `Collection` with the current value and the previous value information with the following structure:
+This will result in a `ValueMetricCollection` with the current value and the previous value information with the following structure:
 
 ```php
 [
     'value' => 123,
     'previous' => [
         'value' => 456,
-        'type' => 'increase', // or 'decrease'
+        'type' => PreviousType::INCREASE, // or PreviousType::DECREASE or PreviousType::IDENTICAL
         'difference' => 333,
         'percentage' => 75.0,
     ],
 ]
 ```
 
-Notice that the `difference` and `percentage` are always positive values, and the `type` denotes whether it is an increase or decrease.
+Notice that the `difference` and `percentage` are always positive values (or zero), and the `type` denotes whether it is an increase, decrease, or neither (identical).

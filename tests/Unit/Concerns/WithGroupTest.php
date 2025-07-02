@@ -17,9 +17,9 @@ it('groups value by column name', function ($db) {
     $values = $metrics->groupBy('category')->from(now()->subYears(2))->sum('value')->value();
 
     expect($values->toArray())->toBe([
-        'category1' => 1170,
-        'category2' => 1260,
-        'category3' => 1080,
+        'category1' => ['value' => 1170],
+        'category2' => ['value' => 1260],
+        'category3' => ['value' => 1080],
     ]);
 })->with('databases');
 
@@ -32,9 +32,9 @@ it('groups value by expression', function ($db) {
     $values = $metrics->groupBy(DB::raw('UPPER(category) as CATEGORY'))->from(now()->subYears(2))->sum('value')->value();
 
     expect($values->toArray())->toBe([
-        'CATEGORY1' => 1170,
-        'CATEGORY2' => 1260,
-        'CATEGORY3' => 1080,
+        'CATEGORY1' => ['value' => 1170],
+        'CATEGORY2' => ['value' => 1260],
+        'CATEGORY3' => ['value' => 1080],
     ]);
 })->with('databases');
 

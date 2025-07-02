@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Beacon\Metrics\Metrics;
+use Beacon\Metrics\Values\Collections\TrendMetricCollection;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -274,6 +275,17 @@ it('can use model queries', function ($db) {
 
     expect($metrics->all()->min('value')->byDay()->trends()->get('labels'))->toHaveCount(4);
 })->with('databases');
+
+it('calculates daily trends with grouped results', function ($db, $aggregate, $expected) {
+    createTestData($db);
+    $builder = DB::table('test_data');
+    $metrics = Metrics::query($builder);
+
+    $trends = $metrics->$aggregate('value')->byDay()->groupBy('category')->trends();
+
+    expect($trends)->toBeInstanceOf(TrendMetricCollection::class)
+        ->and($trends->toArray())->toBe($expected, $metrics->query);
+})->with('databases', 'daily trends grouped');
 
 dataset('daily trends', [
     [
@@ -1553,6 +1565,139 @@ dataset('every other month trends with missing data', [
                 260,
             ],
             'total' => 260,
+        ],
+    ],
+]);
+
+dataset('daily trends grouped', [
+    [
+        'aggregate' => 'count',
+        'expected' => [
+            'category1' => [
+                'labels' => [
+                    '2025-03-20',
+                ],
+                'data' => [1],
+                'total' => 1,
+            ],
+            'category2' => [
+                'labels' => [
+                    '2025-03-27',
+                ],
+                'data' => [1],
+                'total' => 1,
+            ],
+            'category3' => [
+                'labels' => [
+                    '2025-03-10',
+                ],
+                'data' => [1],
+                'total' => 1,
+            ],
+        ],
+    ],
+    [
+        'aggregate' => 'sum',
+        'expected' => [
+            'category1' => [
+                'labels' => [
+                    '2025-03-20',
+                ],
+                'data' => [70],
+                'total' => 70,
+            ],
+            'category2' => [
+                'labels' => [
+                    '2025-03-27',
+                ],
+                'data' => [80],
+                'total' => 80,
+            ],
+            'category3' => [
+                'labels' => [
+                    '2025-03-10',
+                ],
+                'data' => [60],
+                'total' => 60,
+            ],
+        ],
+    ],
+    [
+        'aggregate' => 'average',
+        'expected' => [
+            'category1' => [
+                'labels' => [
+                    '2025-03-20',
+                ],
+                'data' => [70],
+                'total' => 70,
+            ],
+            'category2' => [
+                'labels' => [
+                    '2025-03-27',
+                ],
+                'data' => [80],
+                'total' => 80,
+            ],
+            'category3' => [
+                'labels' => [
+                    '2025-03-10',
+                ],
+                'data' => [60],
+                'total' => 60,
+            ],
+        ],
+    ],
+    [
+        'aggregate' => 'min',
+        'expected' => [
+            'category1' => [
+                'labels' => [
+                    '2025-03-20',
+                ],
+                'data' => [70],
+                'total' => 70,
+            ],
+            'category2' => [
+                'labels' => [
+                    '2025-03-27',
+                ],
+                'data' => [80],
+                'total' => 80,
+            ],
+            'category3' => [
+                'labels' => [
+                    '2025-03-10',
+                ],
+                'data' => [60],
+                'total' => 60,
+            ],
+        ],
+    ],
+    [
+        'aggregate' => 'max',
+        'expected' => [
+            'category1' => [
+                'labels' => [
+                    '2025-03-20',
+                ],
+                'data' => [70],
+                'total' => 70,
+            ],
+            'category2' => [
+                'labels' => [
+                    '2025-03-27',
+                ],
+                'data' => [80],
+                'total' => 80,
+            ],
+            'category3' => [
+                'labels' => [
+                    '2025-03-10',
+                ],
+                'data' => [60],
+                'total' => 60,
+            ],
         ],
     ],
 ]);

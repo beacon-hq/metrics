@@ -19,10 +19,10 @@ it('applies conditional when true', function ($db) {
         ->byDay()
         ->trends();
 
-    expect($trends['labels'])->toHaveCount(5)
-        ->and($trends['labels'][0])
+    expect($trends->labels)->toHaveCount(5)
+        ->and($trends->labels[0])
         ->toBe('2025-04-06')
-        ->and($trends['labels'][4])
+        ->and($trends->labels[4])
         ->toBe('2025-04-10');
 })->with('databases');
 
@@ -37,9 +37,9 @@ it('does not apply conditional when false', function ($db) {
         ->byDay()
         ->trends();
 
-    expect($trends['labels'])->toHaveCount(3)
-        ->and($trends['labels'][0])
+    expect($trends->labels)->toHaveCount(3)
+        ->and($trends->labels[0])
         ->toBe('2025-03-10')
-        ->and($trends['labels'][2])
+        ->and($trends->labels[2])
         ->toBe('2025-03-27');
 })->with('databases');

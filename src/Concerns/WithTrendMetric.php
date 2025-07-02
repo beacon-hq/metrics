@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Beacon\Metrics\Concerns;
 
 use Beacon\Metrics\Enums\Interval;
+use Beacon\Metrics\Values\Collections\TrendMetricCollection;
+use Beacon\Metrics\Values\Projections;
+use Beacon\Metrics\Values\TrendMetric;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Schema\Builder;
@@ -13,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 
 trait WithTrendMetric
 {
-    public function trends(bool $inPercent = false): Collection
+    public function trends(bool $inPercent = false): TrendMetric|TrendMetricCollection
     {
         // @phpstan-ignore method.notFound
         $baseQuery = $this->builder->getConnection()->query()
@@ -82,7 +85,17 @@ trait WithTrendMetric
         $formattedData = $this->getFormattedTrendsData($trendsData, $inPercent);
 
         // Include projections if any
-        return $this->includeProjections($formattedData);
+        $withProjections = $this->includeProjections($formattedData);
+
+        if ($this->groupBy !== null) {
+            return TrendMetricCollection::wrap($withProjections->mapWithKeys(
+                function (Collection $groupTrend, string $key): array {
+                    return [$key => TrendMetric::from($groupTrend)];
+                }
+            ));
+        }
+
+        return TrendMetric::from(...$withProjections);
     }
 
     protected function formatTrends(Collection $data, bool $inPercent = false): Collection
@@ -101,9 +114,12 @@ trait WithTrendMetric
             );
         }
 
-        $result['total'] = $total->value();
         if ($this->groupBy !== null) {
-            $result['total'] = $result['total']->get($data->first()['grp']);
+            $totalValues = $total->value();
+            $groupValue = $totalValues->get($data->first()['grp']);
+            $result['total'] = $groupValue ? $groupValue->value : 0;
+        } else {
+            $result['total'] = $total->value()->value;
         }
 
         $data->each(function ($datum) use ($inPercent, &$result) {
