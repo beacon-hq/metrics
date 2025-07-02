@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 use Beacon\Metrics\Concerns\WithProjection;
 use Beacon\Metrics\Metrics;
+use Beacon\Metrics\Values\Collections\TrendMetricCollection;
+use Beacon\Metrics\Values\Projections;
+use Beacon\Metrics\Values\Projections\DateProjection;
+use Beacon\Metrics\Values\Projections\WhenProjection;
 use Carbon\CarbonImmutable;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 covers(WithProjection::class);
@@ -59,15 +62,15 @@ it('can project when a metric will reach a specific value', function ($db) {
 
     expect($trends)
         ->toHaveKey('projections')
-        ->and($trends['projections'])
-        ->toHaveKey('when')
-        ->and($trends['projections']['when'])
-        ->toHaveKeys(['target_value', 'projected_date', 'confidence'])
-        ->and($trends['projections']['when']['target_value'])
+        ->and($trends->projections)
+        ->toBeInstanceOf(Projections::class)
+        ->and($trends->projections->when)
+        ->toBeInstanceOf(WhenProjection::class)
+        ->and($trends->projections->when->targetValue)
         ->toBe(2000)
-        ->and($trends['projections']['when']['projected_date'])
+        ->and($trends->projections->when->projectedDate->toDateTimeString())
         ->toBe('2025-04-24 00:00:00')
-        ->and($trends['projections']['when']['confidence'])
+        ->and($trends->projections->when->confidence)
         ->toBe(76);
 })->with('databases');
 
@@ -117,11 +120,11 @@ it('can project what a metric will be at a specific date', function ($db) {
 
     expect($trends)
         ->toHaveKey('projections')
-        ->and($trends['projections'])->toHaveKey('date')
-        ->and($trends['projections']['date'])->toHaveKeys(['target_date', 'projected_total', 'confidence'])
-        ->and($trends['projections']['date']['target_date'])->toBe($targetDate->toDateTimeString())
-        ->and($trends['projections']['date']['projected_total'])->toBe(984.0)
-        ->and($trends['projections']['date']['confidence'])->toBe(76);
+        ->and($trends->projections)->toHaveKey('date')
+        ->and($trends->projections->date)->toBeInstanceOf(DateProjection::class)
+        ->and($trends->projections->date->targetDate->equalTo($targetDate))->toBeTrue()
+        ->and($trends->projections->date->projectedTotal)->toBe(984.0)
+        ->and($trends->projections->date->confidence)->toBe(76);
 })->with('databases');
 
 it('can chain multiple projections', function ($db) {
@@ -171,9 +174,9 @@ it('can chain multiple projections', function ($db) {
 
     expect($trends)
         ->toHaveKey('projections')
-        ->and($trends['projections'])->toHaveKeys(['when', 'date'])
-        ->and($trends['projections']['when']['projected_date'])->toBe('2025-04-24 00:00:00')
-        ->and($trends['projections']['date']['projected_total'])->toBe(2200.0);
+        ->and($trends->projections)->toBeInstanceOf(Projections::class)
+        ->and($trends->projections->when->projectedDate->toDateTimeString())->toBe('2025-04-24 00:00:00')
+        ->and($trends->projections->date->projectedTotal)->toBe(2200.0);
 })->with('databases');
 
 it('handles grouped projections', function ($db) {
@@ -251,16 +254,14 @@ it('handles grouped projections', function ($db) {
         ->trends();
 
     expect($trends)
-        ->toBeInstanceOf(Collection::class)
+        ->toBeInstanceOf(TrendMetricCollection::class)
         ->and($trends->has('category1'))->toBeTrue()
-        ->and($trends['category1'])->toHaveKey('projections')
-        ->and($trends['category1']['projections'])->toHaveKeys(['when', 'date'])
-        ->and($trends['category1']['projections']['when']['projected_date'])->toBe('2025-04-24 00:00:00')
-        ->and($trends['category1']['projections']['date']['projected_total'])->toBe(984.0)
+        ->and($trends['category1']->projections)->toBeInstanceOf(Projections::class)
+        ->and($trends['category1']->projections->when->projectedDate->toDateTimeString())->toBe('2025-04-24 00:00:00')
+        ->and($trends['category1']->projections->date->projectedTotal)->toBe(984.0)
         ->and($trends->has('category2'))->toBeTrue()
-        ->and($trends['category2'])->toHaveKey('projections')
-        ->and($trends['category2']['projections']['when']['projected_date'])->toBe('2025-04-15 00:00:00')
-        ->and($trends['category2']['projections']['date']['projected_total'])->toBe(1967.0);
+        ->and($trends['category2']->projections->when->projectedDate->toDateTimeString())->toBe('2025-04-15 00:00:00')
+        ->and($trends['category2']->projections->date->projectedTotal)->toBe(1967.0);
 })->with('databases');
 
 it('can project when a metric will reach a specific value with slow rate of change', function ($db) {
@@ -336,15 +337,15 @@ it('can project when a metric will reach a specific value with slow rate of chan
 
     expect($trends)
         ->toHaveKey('projections')
-        ->and($trends['projections'])
-        ->toHaveKey('when')
-        ->and($trends['projections']['when'])
-        ->toHaveKeys(['target_value', 'projected_date', 'confidence'])
-        ->and($trends['projections']['when']['projected_date'])
+        ->and($trends->projections)
+        ->toBeInstanceOf(Projections::class)
+        ->and($trends->projections->when)
+        ->toBeInstanceOf(WhenProjection::class)
+        ->and($trends->projections->when->projectedDate->toDateTimeString())
         ->toBe('2025-05-15 00:00:00')
-        ->and($trends['projections']['when']['target_value'])
+        ->and($trends->projections->when->targetValue)
         ->toBe(1000)
-        ->and($trends['projections']['when']['confidence'])
+        ->and($trends->projections->when->confidence)
         ->toBe(25);
 })->with('databases');
 
@@ -421,15 +422,15 @@ it('can project what value a metric will have on a specific date with slow rate 
 
     expect($trends)
         ->toHaveKey('projections')
-        ->and($trends['projections'])
-        ->toHaveKey('date')
-        ->and($trends['projections']['date'])
-        ->toHaveKeys(['target_date', 'projected_total', 'confidence'])
-        ->and($trends['projections']['date']['projected_total'])
+        ->and($trends->projections)
+        ->toBeInstanceOf(Projections::class)
+        ->and($trends->projections->date)
+        ->toBeInstanceOf(DateProjection::class)
+        ->and($trends->projections->date->projectedTotal)
         ->toBe(470.0)
-        ->and($trends['projections']['date']['target_date'])
+        ->and($trends->projections->date->targetDate->toDateTimeString())
         ->toBe('2025-06-28 17:08:34')
-        ->and($trends['projections']['date']['confidence'])
+        ->and($trends->projections->date->confidence)
         ->toBe(35);
 })->with('databases');
 
@@ -457,17 +458,16 @@ it('does not project when with a single value', function ($db) {
 
     expect($trends)
         ->toHaveKey('projections')
-        ->and($trends['projections'])
-        ->toHaveKey('when')
-        ->and($trends['projections']['when'])
-        ->toHaveKeys(['target_value', 'projected_date', 'confidence'])
-        ->and($trends['projections']['when']['projected_date'])
+        ->and($trends->projections)
+        ->toBeInstanceOf(Projections::class)
+        ->and($trends->projections->when)
+        ->toBeInstanceOf(WhenProjection::class)
+        ->and($trends->projections->when->projectedDate)
         ->toBeNull()
-        ->and($trends['projections']['when']['target_value'])
+        ->and($trends->projections->when->targetValue)
         ->toBe(200)
-        ->and($trends['projections']['when']['confidence'])
+        ->and($trends->projections->when->confidence)
         ->toBe(0);
-
 })->with('databases');
 
 it('does not project value with a single value', function ($db) {
@@ -494,15 +494,15 @@ it('does not project value with a single value', function ($db) {
 
     expect($trends)
         ->toHaveKey('projections')
-        ->and($trends['projections'])
-        ->toHaveKey('date')
-        ->and($trends['projections']['date'])
-        ->toHaveKeys(['target_date', 'projected_total', 'confidence'])
-        ->and($trends['projections']['date']['projected_total'])
+        ->and($trends->projections)
+        ->toBeInstanceOf(Projections::class)
+        ->and($trends->projections->date)
+        ->toBeInstanceOf(DateProjection::class)
+        ->and($trends->projections->date->projectedTotal)
         ->toBeNull()
-        ->and($trends['projections']['date']['target_date'])
+        ->and($trends->projections->date->targetDate->toDateTimeString())
         ->toBe('2025-04-15 02:38:15')
-        ->and($trends['projections']['date']['confidence'])
+        ->and($trends->projections->date->confidence)
         ->toBe(0);
 })->with('databases');
 
@@ -535,12 +535,13 @@ it('can project value to a future date from sparse dataset', function ($db) {
         ->projectForDate(CarbonImmutable::create(2025, 04, 22, 0, 0, 0))
         ->trends();
 
-    expect($metrics['projections'])
-        ->toBeArray()
-        ->and($metrics['projections']['date'])->toHaveKeys(['target_date', 'projected_total', 'confidence'])
-        ->and($metrics['projections']['date']['target_date'])->toBe('2025-04-22 00:00:00')
-        ->and($metrics['projections']['date']['projected_total'])->toBe(87.0)
-        ->and($metrics['projections']['date']['confidence'])->toBe(22);
+    expect($metrics->projections)
+        ->toBeInstanceOf(Projections::class)
+        ->and($metrics->projections->date)
+        ->toBeInstanceOf(DateProjection::class)
+        ->and($metrics->projections->date->targetDate->toDateTimeString())->toBe('2025-04-22 00:00:00')
+        ->and($metrics->projections->date->projectedTotal)->toBe(87.0)
+        ->and($metrics->projections->date->confidence)->toBe(22);
 })->with('databases');
 
 it('can project when a metric will reach a specific value from sparse dataset', function ($db) {
@@ -572,10 +573,11 @@ it('can project when a metric will reach a specific value from sparse dataset', 
         ->projectWhen(100)
         ->trends();
 
-    expect($metrics['projections'])
-        ->toBeArray()
-        ->and($metrics['projections']['when'])->toHaveKeys(['target_value', 'projected_date', 'confidence'])
-        ->and($metrics['projections']['when']['target_value'])->toBe(100)
-        ->and($metrics['projections']['when']['projected_date'])->toBe('2025-04-22 00:00:00')
-        ->and($metrics['projections']['when']['confidence'])->toBe(22);
+    expect($metrics->projections)
+        ->toBeInstanceOf(Projections::class)
+        ->and($metrics->projections->when)
+        ->toBeInstanceOf(WhenProjection::class)
+        ->and($metrics->projections->when->targetValue)->toBe(100)
+        ->and($metrics->projections->when->projectedDate->toDateTimeString())->toBe('2025-04-22 00:00:00')
+        ->and($metrics->projections->when->confidence)->toBe(22);
 })->with('databases');

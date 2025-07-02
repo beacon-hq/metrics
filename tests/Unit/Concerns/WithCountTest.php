@@ -16,10 +16,10 @@ it('counts between', function ($db) {
 
     $trends = $metrics->countBetween(Carbon::parse('2025-04-06'), now())->byDay()->trends();
 
-    expect($trends['labels'])->toHaveCount(5)
-        ->and($trends['labels'][0])
+    expect($trends->labels)->toHaveCount(5)
+        ->and($trends->labels[0])
         ->toBe('2025-04-06')
-        ->and($trends['labels'][4])
+        ->and($trends->labels[4])
         ->toBe('2025-04-10');
 })->with('databases');
 
@@ -31,10 +31,10 @@ it('count from', function ($db) {
 
     $trends = $metrics->countFrom(Carbon::parse('2025-04-06'), 'value')->byDay()->trends();
 
-    expect($trends['labels'])->toHaveCount(5)
-        ->and($trends['labels'][0])
+    expect($trends->labels)->toHaveCount(5)
+        ->and($trends->labels[0])
         ->toBe('2025-04-06')
-        ->and($trends['labels'][4])
+        ->and($trends->labels[4])
         ->toBe('2025-04-10');
 })->with('databases');
 

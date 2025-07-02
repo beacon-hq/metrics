@@ -15,24 +15,15 @@ $metrics = Metrics::query(MyModel::query())
     ->trends();
 ```
 
-This will result in a Laravel `Collection` with `labels`, `data`, and `total` keys. As an array it might look like the following:
+This will result in a `TrendMetric` object that looks like this:
 
-```php{2,8,14}
-[
-    'labels' => [
-        '2025-04-07', 
-        '2025-04-08', 
-        '2025-04-09', 
-        '2025-04-11', 
-    ],
-    'data' => [
-        100,
-        200,
-        300,
-        400,
-    ],
-    'total' => 1000,
-]
+```php
+TrendMetric<{
+    'labels' => Collection<string>, // the [sorted] date labels for the data
+    'data' => Collection<float|int>, // the aggregate values for the labels
+    'total' => float|int, // the total for the entire result set
+    'projections' => Optional|ProjectionValue, // optional projections for the trend
+}>
 ```
 
 ## Fill Missing Values
@@ -74,8 +65,100 @@ Now the above result set might look like:
 ```
 
 > [!NOTE]
-> Counter-intuitively, it can be faster to include missing intervals as the database will always calculate them and will
+> Counterintuitively, it can be faster to include missing intervals as the database will always calculate them and will
 > have to omit them explicitly when calculating the result set.
+
+## Grouping
+
+You can group your metrics by a column using the `->groupBy()` method. This will group the results by the specified column.
+
+```php{6}
+use App\Models\MyModel;
+use Beacon\Metrics\Metrics;
+
+$metrics = Metrics::query(MyModel::query())
+    ->...
+    ->groupBy('type')
+    ->trends();
+```
+
+This will return a `TrendMetricCollection` object with the group value as keys, and the `TrendMetric` as the values:
+
+```php
+TrendMetricCollection<mixed, TrendMetric>
+```
+
+For example, as an array a result might look like the following:
+
+
+
+```php
+[
+    'shirts' => [
+        'labels' => [
+            '2025-04-07', 
+            '2025-04-08', 
+            '2025-04-09', 
+            '2025-04-10', 
+            '2025-04-11',
+        ],
+        'data' => [100, 200, 300, 0, 400],
+        'total' => 1000,
+    ],
+    'pants' => [
+        'labels' => [
+            '2025-04-07', 
+            '2025-04-08', 
+            '2025-04-09', 
+            '2025-04-10', 
+            '2025-04-11',
+        ],
+        'data' => [50, 100, 150, 0, 200],
+        'total' => 500,
+    ],
+    'shoes' => [
+        'labels' => [
+            '2025-04-07', 
+            '2025-04-08', 
+            '2025-04-09', 
+            '2025-04-10', 
+            '2025-04-11',
+        ],
+        'data' => [25, 50, 75, 0, 100],
+        'total' => 250,
+    ],
+]
+```
+
+## Associative Result Sets
+
+You can return label-value pairs of separate arrays using the `->assoc()` method:
+
+```php{4}
+$metrics = Metrics::query(MyModel::query())
+    ->...
+    ->trends()
+    ->assoc();
+```
+
+Will return a Laravel `Collection` that looks like this:
+
+```php
+[
+    '2025-04-07' => 100, 
+    '2025-04-08' => 200,
+    '2025-04-09' => 300, 
+    '2025-04-10' => 0, 
+    '2025-04-11' => 400,
+]
+```
+
+If you also want a `total` value, you can pass `true` to the `->assoc()` method.
+
+```php{4}
+
+> [!TIP]
+> `->assoc()` also works with `TrendMetricCollection` objects, allowing you to get associative arrays for each group.
 
 ## Projections
 
@@ -83,6 +166,23 @@ Projections allow you to predict future values based on the trend of your data. 
 
 1. **Value Projection**: Predict when a metric will reach a specific value
 2. **Date Projection**: Predict what a metric's value will be at a specific date
+
+Projections are returned as `ProjectionValue` objects as part of the `TrendMetric` object, `TrendMetric->projections`:
+
+```php
+ProjectionValue<{
+    'when' => Optional|ProjectionWhen<{
+        targetValue: int|float|null,
+        projectedDate: \Carbon\CarbonImmutable, // the date when the value is projected to be reached
+        confidence: int, // confidence level (0-100) based on data consistency
+    }>
+    'date' => Optional|ProjectionDate<{
+        targetDate: ?\Carbon\CarbonImmutable, // the target date for the projection
+        projectedTotal: int|float, // the projected value at the target date
+        confidence: int, // confidence level (0-100) based on data consistency
+    }>
+}>
+```
 
 ### Value Projection
 
@@ -100,14 +200,14 @@ $metrics = Metrics::query(MyModel::query())
     ->trends();
 ```
 
-This will add a `projections` key to the result with a `when` subkey containing:
+This will result in `->projections` being a `ProjectionValue` object to the result with a `when` property containing:
 
 ```php
 [
     'projections' => [
         'when' => [
-            'target_value' => 1000,
-            'projected_date' => '2025-05-15 00:00:00', // The date when the value is projected to reach 1000
+            'targetValue' => 1000,
+            'projectedDate' => '2025-05-15 00:00:00', // The date when the value is projected to reach 1000
             'confidence' => 85, // Confidence level (0-100) based on data consistency
         ],
     ],
@@ -132,7 +232,7 @@ $metrics = Metrics::query(MyModel::query())
     ->trends();
 ```
 
-This will add a `projections` key to the result with a `date` subkey containing:
+This will set the `projections` value for the result with a `date` subkey containing:
 
 ```php
 [
@@ -176,7 +276,7 @@ $metrics = Metrics::query(MyModel::query())
     ->trends();
 ```
 
-This will return a collection where each group has its own projections:
+This will return a `TrendMetricCollection` where each group has its own projections:
 
 ```php
 [

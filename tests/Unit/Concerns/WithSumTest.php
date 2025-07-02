@@ -16,10 +16,10 @@ it('sums between', function ($db) {
 
     $trends = $metrics->sumBetween(Carbon::parse('2025-04-06'), now(), 'value')->byDay()->trends();
 
-    expect($trends['labels'])->toHaveCount(5)
-        ->and($trends['labels'][0])
+    expect($trends->labels)->toHaveCount(5)
+        ->and($trends->labels[0])
         ->toBe('2025-04-06')
-        ->and($trends['labels'][4])
+        ->and($trends->labels[4])
         ->toBe('2025-04-10');
 })->with('databases');
 
@@ -31,10 +31,10 @@ it('sums from', function ($db) {
 
     $trends = $metrics->sumFrom(Carbon::parse('2025-04-06'), 'value')->byDay()->trends();
 
-    expect($trends['labels'])->toHaveCount(5)
-        ->and($trends['labels'][0])
+    expect($trends->labels)->toHaveCount(5)
+        ->and($trends->labels[0])
         ->toBe('2025-04-06')
-        ->and($trends['labels'][4])
+        ->and($trends->labels[4])
         ->toBe('2025-04-10');
 })->with('databases');
 

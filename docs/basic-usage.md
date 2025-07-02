@@ -111,12 +111,12 @@ Value metrics are simple single aggregate values and will typically result in a 
 $value = $metrics->value();
 ```
 
-The `->value()` method will typically return the value for the specified date range, resulting in a single `float` or `int` value.
+The `->value()` method will either return a `ValueMetric` object for the specified date range, with a `->value` property containing a single `float` or `int` value.
 
-However, when using `->groupBy()`, the `->value()` method will return a Laravel Collection with the group value as keys, and the aggregate value as the value:
+However, when using `->groupBy()`, the `->value()` method will return a  `ValueMetricCollection` with the group value as keys, and the aggregate `ValueMetric` as the value:
 
 ```php
-Collection<mixed, float|int> 
+ValueMetricCollection<mixed, ValueMetric> 
 ```
 
 #### Calculating Previous Period Comparison
@@ -128,15 +128,15 @@ this can be achieved using the `Metric->withPrevious()` method.
 $previous = $metrics->withPrevious()->value();
 ```
 
-This will return a Laravel Collection with the following structure:
+This will return a `ValueMetric` object with the following structure:
 
 ```php
-Collection<{
+ValueMetric<{
     'value' => float|int, // the value for the current period
     'previous' => [
         'value' => float|int, // the value for the previous period
         // If there is a difference the following will also be set:
-        'type' => string, // increase or decrease
+        'type' => PreviousType::class, // increase, decrease, or identical
         'difference' => float|int, // the difference between the two values
         'percentage' => float|int, // the percentage difference between the two values
     ],
@@ -166,12 +166,12 @@ e.g. every third day, every second month.
 $metrics->trends();
 ```
 
-The `->trends()` method will return a Laravel Collection with the following structure:
+The `->trends()` method will return a `TrendMetric` with the following structure:
 
 ```php
-Collection<{
-    'labels' => array<string>, // the [sorted] date labels for the data
-    'data' => array<float|int>, // the aggregate values for the labels
+TrendMetric<{
+    'labels' => Collection<string>, // the [sorted] date labels for the data
+    'data' => Collection<float|int>, // the aggregate values for the labels
     'total' => float|int, // the total for the entire result set
 }>
 ```

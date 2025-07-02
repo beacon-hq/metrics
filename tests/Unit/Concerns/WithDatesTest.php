@@ -17,10 +17,10 @@ it('counts between', function ($db) {
 
     $trends = $metrics->count()->between(Carbon::parse('2025-04-06'), now())->byDay()->trends();
 
-    expect($trends['labels'])->toHaveCount(5)
-        ->and($trends['labels'][0])
+    expect($trends->labels)->toHaveCount(5)
+        ->and($trends->labels[0])
         ->toBe('2025-04-06')
-        ->and($trends['labels'][4])
+        ->and($trends->labels[4])
         ->toBe('2025-04-10');
 })->with('databases');
 
@@ -32,10 +32,10 @@ it('counts from', function ($db) {
 
     $trends = $metrics->count()->from(Carbon::parse('2025-04-06'))->byDay()->trends();
 
-    expect($trends['labels'])->toHaveCount(5)
-        ->and($trends['labels'][0])
+    expect($trends->labels)->toHaveCount(5)
+        ->and($trends->labels[0])
         ->toBe('2025-04-06')
-        ->and($trends['labels'][4])
+        ->and($trends->labels[4])
         ->toBe('2025-04-10');
 })->with('databases');
 
@@ -47,10 +47,10 @@ it('counts period', function ($db) {
 
     $trends = $metrics->count()->period(Period::LAST_30_DAYS)->trends();
 
-    expect($trends['labels'])->toHaveCount(7)
-        ->and($trends['labels'][0])
+    expect($trends->labels)->toHaveCount(7)
+        ->and($trends->labels[0])
         ->toBe('2025-03-20')
-        ->and($trends['labels'][6])
+        ->and($trends->labels[6])
         ->toBe('2025-04-09');
 })->with('databases');
 
@@ -73,9 +73,9 @@ it('formats day of the week', function ($db) {
 
     $trends = $metrics->count()->from(now()->subYears(2))->byDayOfWeek()->trends();
 
-    expect($trends['labels'])->toHaveCount(7)
-        ->and($trends['labels'][0])
+    expect($trends->labels)->toHaveCount(7)
+        ->and($trends->labels[0])
         ->toBe('Sunday')
-        ->and($trends['labels'][6])
+        ->and($trends->labels[6])
         ->toBe('Saturday');
 })->with('databases');

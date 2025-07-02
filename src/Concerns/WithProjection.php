@@ -13,7 +13,7 @@ trait WithProjection
 {
     protected float|int|null $projectionTargetValue = null;
 
-    protected ?CarbonInterface $projectionTargetDate = null;
+    protected ?CarbonImmutable $projectionTargetDate = null;
 
     protected array $projections = [];
 
@@ -26,7 +26,7 @@ trait WithProjection
 
     public function projectForDate(CarbonInterface $date): self
     {
-        $this->projectionTargetDate = $date;
+        $this->projectionTargetDate = new CarbonImmutable($date);
 
         return $this;
     }
@@ -64,8 +64,8 @@ trait WithProjection
 
         if (count($labels) < 2 || count($labels) !== count($data)) {
             return [
-                'target_value' => $targetValue,
-                'projected_date' => null,
+                'targetValue' => $targetValue,
+                'projectedDate' => null,
                 'confidence' => 0,
             ];
         }
@@ -75,8 +75,8 @@ trait WithProjection
         $currentTotal = array_sum($normalizedData);
         if ($currentTotal >= $targetValue) {
             return [
-                'target_value' => $targetValue,
-                'projected_date' => null,
+                'targetValue' => $targetValue,
+                'projectedDate' => null,
                 'confidence' => 100,
             ];
         }
@@ -90,8 +90,8 @@ trait WithProjection
         $confidence = $this->calculateConfidence($normalizedData);
 
         return [
-            'target_value' => $targetValue,
-            'projected_date' => $projectedDate->toDateTimeString(),
+            'targetValue' => $targetValue,
+            'projectedDate' => $projectedDate,
             'confidence' => $confidence,
         ];
     }
@@ -103,8 +103,8 @@ trait WithProjection
 
         if (count($labels) < 2 || count($labels) !== count($data)) {
             return [
-                'target_date' => $targetDate->toDateTimeString(),
-                'projected_total' => null,
+                'targetDate' => $targetDate,
+                'projectedTotal' => null,
                 'confidence' => 0,
             ];
         }
@@ -129,8 +129,8 @@ trait WithProjection
         $confidence = $this->calculateConfidence($normalizedData);
 
         return [
-            'target_date' => $targetDate->toDateTimeString(),
-            'projected_total' => round($currentTotal + $projectedIncrement),
+            'targetDate' => $targetDate->toDateTimeString(),
+            'projectedTotal' => round($currentTotal + $projectedIncrement),
             'confidence' => $confidence,
         ];
     }

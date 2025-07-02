@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
+use Beacon\Metrics\Enums\PreviousType;
 use Beacon\Metrics\Exceptions\InvalidDateRangeException;
 use Beacon\Metrics\Metrics;
+use Beacon\Metrics\Values\Collections\ValueMetricCollection;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -19,7 +21,7 @@ it('calculates value metric no dates', function ($db, $aggregate, $metric) {
     $metrics = Metrics::query($builder);
     $value = $metrics->$aggregate('value')->value();
 
-    expect($value)->toBe($metric, $metrics->query);
+    expect($value->value)->toBe($metric, $metrics->query);
 })->with('databases', 'aggregate values');
 
 it('calculates value metric and previous with decrease', function ($db) {
@@ -41,7 +43,7 @@ it('calculates value metric and previous with decrease', function ($db) {
     expect($value->toArray())->toBe([
         'value' => 0,
         'previous' => [
-            'type' => 'decrease',
+            'type' => PreviousType::DECREASE,
             'value' => 115,
             'difference' => 115,
             'percentage' => 100,
@@ -67,7 +69,7 @@ it('casts floats correctly', function ($db) {
 
     $value = $metrics->sum('value')->from(now()->subDays(7))->byDay()->value();
 
-    expect($value)->toBeFloat();
+    expect($value->value)->toBeFloat();
 })->with('databases');
 
 it('calculates value over all data', function ($db) {
@@ -77,7 +79,7 @@ it('calculates value over all data', function ($db) {
 
     $value = $metrics->count()->all()->value();
 
-    expect($value)
+    expect($value->value)
         ->toBe(26);
 })->with('databases');
 
@@ -103,7 +105,7 @@ it('can use model queries', function ($db) {
     );
 
     $value = $metrics->all()->min('value')->byDay()->value();
-    expect($value)->toBe(110, $metrics->query);
+    expect($value->value)->toBe(110, $metrics->query);
 })->with('databases');
 
 it('can use model queries with group', function ($db) {
@@ -120,11 +122,12 @@ it('can use model queries with group', function ($db) {
     );
 
     $value = $metrics->all()->min('value')->byDay()->groupBy('category')->value();
-    expect($value->toArray())->toBe([
-        'category1' => 130,
-        'category2' => 110,
-        'category3' => 120,
-    ], $metrics->query);
+    expect($value)->toBeInstanceOf(ValueMetricCollection::class)
+        ->and($value->toArray())->toBe([
+            'category1' => ['value' => 130],
+            'category2' => ['value' => 110],
+            'category3' => ['value' => 120],
+        ], $metrics->query);
 })->with('databases');
 
 dataset('aggregate values', [

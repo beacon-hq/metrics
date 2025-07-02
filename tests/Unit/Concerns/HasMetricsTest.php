@@ -18,5 +18,5 @@ it('expands models', function ($db) {
     };
 
     $value = $model->metrics()->value();
-    expect($value)->toBe(3);
+    expect($value->value)->toBe(3);
 })->with('databases');
