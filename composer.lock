@@ -7704,7 +7704,7 @@
         },
         {
             "name": "captainhook/captainhook-phar",
-            "version": "5.25.5",
+            "version": "5.25.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/captainhook-git/captainhook-phar.git",
@@ -7758,7 +7758,7 @@
             ],
             "support": {
                 "issues": "https://github.com/captainhook-git/captainhook/issues",
-                "source": "https://github.com/captainhook-git/captainhook-phar/tree/5.25.5"
+                "source": "https://github.com/captainhook-git/captainhook-phar/tree/5.25.6"
             },
             "funding": [
                 {
@@ -12264,12 +12264,12 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.2"
     },
-    "platform-dev": {},
-    "plugin-api-version": "2.6.0"
+    "platform-dev": [],
+    "plugin-api-version": "2.3.0"
 }
