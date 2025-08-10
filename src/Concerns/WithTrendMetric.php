@@ -77,6 +77,15 @@ trait WithTrendMetric
             ->groupBy(['grp_label', 'label'])
             ->orderBy('label');
 
+        // We need to ensure the metrics join is first so the original table is available for later joins
+        if (count($query->joins) > 1) {
+            $joins = collect($query->joins);
+            $query->joins = $joins
+                ->unshift($joins->last())
+                ->slice(0, -1)
+                ->toArray();
+        }
+
         $this->query = $query->toRawSql();
 
         $results = $query->get();
