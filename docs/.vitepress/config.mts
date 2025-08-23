@@ -39,7 +39,7 @@ export default withMermaid(defineVersionedConfig({
     ],
   ],
   themeConfig: {
-    logo: '/assets/images/icon.png',
+    logo: '/assets/images/icon.svg',
     search: {
       provider: 'local',
       options: {

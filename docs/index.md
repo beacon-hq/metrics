@@ -6,7 +6,7 @@ hero:
   name: "Beacon Metrics"
   text: "Simple Metrics for Laravel"
   tagline: "<code>composer require beacon-hq/metrics</code>"
-  image: /assets/images/icon.png
+  image: /assets/images/icon.svg
   actions:
     - theme: brand
       text: Get Started
