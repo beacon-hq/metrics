@@ -10,7 +10,7 @@ export default withMermaid(defineVersionedConfig({
   description: "Simple Metrics for Laravel",
   base: BASE_PATH,
   versioning: {
-    latestVersion: 'dev',
+    latestVersion: 'v1.0',
   },
   head: [
     [
