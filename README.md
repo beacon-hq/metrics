@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/images/social.png" width="100%" alt="Beacon Metrics">
+  <img src="./docs/public/assets/images/social.png" width="100%" alt="Beacon Metrics">
 </p>
 <p align="center">
   <a href="https://sonarcloud.io/summary/new_code?id=beacon-hq_metrics">
