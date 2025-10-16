@@ -15,7 +15,7 @@
     "minimum-stability": "stable",
     "require": {
         "php": "^8.2",
-        "dshafik/bag": "^2.5.4",
+        "beacon-hq/bag": "^2.6.2",
         "illuminate/database": "^10|^11|^12",
         "illuminate/support": "^10|^11|^12",
         "nesbot/carbon": "^3.8",
